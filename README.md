@@ -31,6 +31,10 @@ You can also just open `index.html` in any browser to preview.
 
 - `?debug` — overlays each dial's outline, center crosshair, and city label.
   Use this to validate the placement/sizing of every clock.
+- `?grid` — overlays a green alignment grid with coordinate labels and
+  emphasized center axes. `?grid=120` sets the spacing (image px; default 240).
+  The grid lives in the hands layer, so it warps with the hands — line it up
+  against the wall's perspective while tuning the warp params.
 - Warp / keyframe params for live experimentation (see "Overall warp" below):
   `?sx=`, `?sy=` (x/y scale), `?tilt=` (rotateX degrees), `?persp=` (perspective px).
   Example: `index.html?sx=1.04&sy=0.96&tilt=5`.
@@ -83,10 +87,11 @@ Everything lives in the `<script>` in `index.html`:
 
 ### Overall warp / keyframe effect
 
-The whole stage (all three layers) shares one CSS transform, so you can lean or
-stretch the entire wall without anything drifting out of alignment — handy for
-matching the slightly-downward camera angle. Edit the `WARP` defaults in
-`index.html`, or experiment live with the URL params above:
+The warp is applied to the **hands layer only** — not the `bg.jpg`/`fg.png`
+photos. The photos already contain the camera's slightly-downward perspective;
+the warp bends the flat-drawn hands to conform to it. (Use `?grid` to see the
+warp applied to a reference grid and match it against the wall.) Edit the `WARP`
+defaults in `index.html`, or experiment live with the URL params above:
 
 - `scaleX` / `scaleY` (`?sx` / `?sy`) — non-uniform x/y scaling.
 - `tilt` (`?tilt`) — `rotateX` degrees, leaning the top away from the viewer.
