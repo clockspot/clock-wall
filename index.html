@@ -53,8 +53,8 @@
 
   /* Alignment grid (enable with ?grid). Lives inside the hands layer, so it
      warps together with the hands — line it up against the wall's perspective. */
-  .grid-line  { stroke: #0f0; stroke-width: 1.5; opacity: .3; }
-  .grid-axis  { stroke: #0f0; stroke-width: 3;   opacity: .6; }
+  .grid-line  { stroke: #0f0; stroke-width: 2;   opacity: .35; }
+  .grid-axis  { stroke: #0f0; stroke-width: 3.5; opacity: .65; }
   .grid-label { fill: #0f0; font: 16px sans-serif; opacity: .55; }
 </style>
 </head>
@@ -246,6 +246,8 @@
   // Alignment grid (?grid). Drawn in the hands layer so it warps with them.
   if (GRID) {
     const W = 3840, H = 2160, gg = make("g");
+    // Dim the wall behind the grid so the green lines stand out.
+    gg.appendChild(make("rect", { x: 0, y: 0, width: W, height: H, fill: "#000", opacity: 0.1 }));
     for (let x = 0; x <= W; x += GRID_STEP) {
       gg.appendChild(make("line", { class: "grid-line", x1: x, y1: 0, x2: x, y2: H }));
       const t = make("text", { class: "grid-label", x: x + 4, y: 18 });
