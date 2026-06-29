@@ -1,65 +1,30 @@
 <!DOCTYPE html>
+<!-- https://github.com/clockspot/clock-wall-virtual -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Clock Wall</title>
 <style>
-  html, body {
-    margin: 0;
-    height: 100%;
-    /* Approx average of the wall; shows only if an edge ever peeks through. */
-    background: rgb(184, 186, 183);
-    overflow: hidden;
-  }
+  html, body { margin: 0; height: 100%; background: rgb(184, 186, 183); overflow: hidden; }
 
-  /*
-    The stage is locked to the images' native aspect ratio (3840x2160 = 16:9)
-    and sized to COVER the viewport (>= viewport in both axes), then centered.
-    Because the stage aspect exactly matches the images, "cover" introduces no
-    internal distortion: every layer lines up pixel-for-pixel.
+  /* Images are 16:9; size to cover the viewport then center; with excess cropped */
+  #stage { position: fixed; top: 50%; left: 50%; width: max(100vw, 177.778vh); height: max(56.25vw, 100vh); transform: translate(-50%, -50%); }
+  #stage > * { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
-      scale = max(vw/3840, vh/2160)
-      width  = 3840*scale = max(100vw, (3840/2160)*100vh) = max(100vw, 177.778vh)
-      height = 2160*scale = max((2160/3840)*100vw, 100vh) = max(56.25vw, 100vh)
-  */
-  #stage {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    width: max(100vw, 177.778vh);
-    height: max(56.25vw, 100vh);
-    transform: translate(-50%, -50%);
-  }
-  /* The "camera angled down" warp is applied in JS to #hands ONLY, so the
-     bg/fg photos stay put and the drawn hands bend to match them. */
-
-  #stage > * {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-
-  #bg, #fg { object-fit: fill; }  /* stage is already correct aspect */
+  #bg, #fg { object-fit: fill; }
   #fg, #hands, #hands-sec { pointer-events: none; }
-  #hands {
-    /* Very light, very diffuse shadow the hands cast onto the dials. Applied to
-       this layer only — the hour/minute hands and hubs, which change at most
-       once per second. The continuously-sweeping second hands live in #hands-sec
-       with NO filter, so their motion never forces the shadow to re-rasterize.
-       Tune: drop-shadow(<offX> <offY> <blur> <color>). */
-    filter: drop-shadow(0 1px 4px rgba(27, 30, 25, 0.4));
-  }
 
-  /* Debug overlay (enable with ?debug): dial outlines, centers, labels. */
+  /* Define hour/minute hand drop shadow here */
+  /* drop-shadow(<offX> <offY> <blur> <color>) */
+  #hands { filter: drop-shadow(0 1px 4px rgba(27, 30, 25, 0.4)); }
+
+  /* Debug overlay (enable with ?debug) */
   .dbg-circle { fill: none; stroke: #0f0; stroke-width: 2; opacity: .8; }
   .dbg-cross  { stroke: #0f0; stroke-width: 2; opacity: .8; }
   .dbg-label  { fill: #0f0; font: 20px sans-serif; opacity: .9; }
 
-  /* Alignment grid (enable with ?grid). Lives inside the hands layer, so it
-     warps together with the hands — line it up against the wall's perspective. */
+  /* Alignment grid (enable with ?grid) - use to test warp/keyframe params */
   .grid-line  { stroke: #0f0; stroke-width: 2;   opacity: .35; }
   .grid-axis  { stroke: #0f0; stroke-width: 3.5; opacity: .65; }
   .grid-label { fill: #0f0; font: 16px sans-serif; opacity: .55; }
@@ -68,9 +33,6 @@
 <body>
   <div id="stage">
     <img id="bg" src="bg.jpg" alt="">
-    <!-- viewBox uses native image pixels, so clock coordinates are used directly. -->
-    <!-- #hands: hour/minute/hubs (shadowed). #hands-sec: the sweeping second
-         hands (no filter, so their motion never re-rasterizes the shadow). -->
     <svg id="hands"     viewBox="0 0 3840 2160" xmlns="http://www.w3.org/2000/svg"></svg>
     <svg id="hands-sec" viewBox="0 0 3840 2160" xmlns="http://www.w3.org/2000/svg"></svg>
     <img id="fg" src="fg.png" alt="">
@@ -79,112 +41,96 @@
 <script>
 "use strict";
 (function () {
-  // ---- Options (URL flags) -------------------------------------------------
-  //   ?debug      -> draw dial outlines / centers / labels to validate placement
-  //   ?grid       -> draw an alignment grid (green, like ?debug) over the hands
-  //   ?grid=<px>  -> same, with a custom grid spacing in image pixels
-  //   ?factor=<n> -> global hand-width multiplier (per-clock factor still wins)
-  const params  = new URLSearchParams(location.search);
-  const DEBUG   = params.has("debug");
-  const GRID    = params.has("grid");
-  const GRID_STEP = (() => {
-    const v = parseFloat(params.get("grid"));
-    return Number.isFinite(v) && v > 0 ? v : 240;
-  })();
+  ////////// Begin config //////////
 
-  // ---- Overall warp / keyframe effect --------------------------------------
-  // Applied to the HANDS layer ONLY (not the bg/fg photos). The photos already
-  // contain the camera's slightly-downward perspective; this warp bends the
-  // flat-drawn hands to conform to that. The alignment grid lives in the same
-  // layer, so ?grid warps with the hands and lets you match the wall's lines.
-  // Tweak the defaults here, or experiment live via URL params, e.g.
-  //   ?sx=1.04&sy=0.96&tilt=5&persp=1600
-  //   scaleX / scaleY : non-uniform x/y scaling
-  //   tilt            : rotateX degrees — leans the top away, for the
-  //                     slightly-downward camera angle
-  //   persp           : perspective distance in px (smaller = stronger 3D)
-  const num = (k, d) => (params.has(k) ? parseFloat(params.get(k)) : d);
-  const WARP = {
-    scaleX: num("sx",    1),
-    scaleY: num("sy",    1),
-    tilt:   num("tilt",  -3.5),
-    persp:  num("persp", 2000),
-  };
-  // transform-origin defaults to the layer's center (= wall center), so the
-  // identity warp leaves the hands exactly aligned with the photos. Both hand
-  // layers get the same transform so they stay registered with each other.
-  const warpCss =
-    `perspective(${WARP.persp}px) rotateX(${WARP.tilt}deg) ` +
-    `scale(${WARP.scaleX}, ${WARP.scaleY})`;
-  document.getElementById("hands").style.transform = warpCss;
-  document.getElementById("hands-sec").style.transform = warpCss;
-
-  // ---- Default hand styling (fractions of each clock's radius) -------------
-  // Override any of these per-clock via a clock's `style` object.
-//   const DEFAULTS = {
-//     hour:   { len: 0.66, thick: 0.01, color: "#333" },
-//     minute: { len: 1.00, thick: 0.01, color: "#333" },
-//     second: { len: 1.00, thick: 0.01, color: "#a33" },
-//     hubGray: 0.01,   // gray center dot radius
-//     hubRed:  0.01,   // red center dot radius (only when a second hand exists)
-//   };
-  const DEFAULTS = {
-    hour:   { len: 0.66, thick: 0.07, color: "#222" },
-    // cb = counterbalance tail length, as a fraction of the hand's own length,
-    // extending past the center opposite the tip (second hand only by default).
-    minute: { len: 1.00, thick: 0.05, color: "#222" },
-    second: { len: 1.00, thick: 0.02, color: "#743", cb: 0.4 },
-    hubGray: 0.07,   // gray center dot radius
-    hubRed:  0.03,   // red center dot radius (only when a second hand exists)
-    // Hand-WIDTH factor: multiplies every hand thickness AND hub-dot radius.
-    // Because those are fractions of each dial's radius, big dials get fat hands
-    // and small dials get spindly ones; set a per-clock `factor` (see CLOCKS) to
-    // even them out. The factor is ignored for any value overridden explicitly.
-    factor: 1,
-  };
-  // Global factor can be nudged live for tuning, e.g. ?factor=0.8
-  const GLOBAL_FACTOR = num("factor", DEFAULTS.factor);
-
-  // Center pin for clocks WITHOUT a second hand: a uniform #333 dot, the same
-  // absolute radius (image px) on every clock (not scaled by dial size/factor).
-  const PLAIN_HUB_R = 4.5;
-
-  // ---- The wall ------------------------------------------------------------
-  // cx,cy = dial CENTER (image pixels); d = diameter.
-  // corr  = straightness correction in degrees, +clockwise / -counterclockwise.
-  // tz    = IANA zone. style = optional per-clock overrides (see DEFAULTS).
-  // second = "sweep" (smooth) or "tick" (steps each second) to give a clock a
-  //          red second hand; omit for no second hand (the default).
-  // factor = per-clock hand-width multiplier (overrides the global DEFAULTS one).
-  //          Use < 1 to slim a big dial's hands, > 1 to thicken a small dial's.
-  // To use a photo hand instead of a drawn one, add e.g.
-  //   images: { minute: { href: "hands/min.png", pivot: 0.5 } }
-  // (pivot = fraction of the image height between the rotation center and the
-  //  far tip; 0.5 means the pivot is at the image's middle.)
+  //Clock definitions
+  //city   = reference; not shown except in debug
+  //tz     = IANA zone
+  //cx,cy  = dial center (per original image pixels from top left)
+  //d      = diameter (pixels)
+  //Optional:
+  //factor = per-clock hand-width multiplier (overrides default)
+  //style  = per-clock/per-property overrides of DEFAULTS below
+  //corr   = straightness correction in degrees, +clockwise / -counterclockwise
+  //second = "sweep" or "tick"
+  //images = to use a photo hand instead of a drawn one, add e.g.:
+  //  images: { minute: { href: "hands/min.png", pivot: 0.5 } }
+  //  (pivot = fraction of the image height between the rotation center and the far tip; 0.5 means the pivot is at the image's middle)
   const CLOCKS = [
     { city: "Honolulu",     tz: "Pacific/Honolulu",   cx: 412,  cy: 1665, d: 272, factor: 1.8 },
-    { city: "Vancouver",    tz: "America/Vancouver",  cx: 905,  cy: 1645, d: 320, factor: 0.9, style: {hour: {thick: 0.12}, hubGray: 0.1}, corr: -0.7 },
-    { city: "Los Angeles",  tz: "America/Los_Angeles",cx: 598,  cy: 983,  d: 500, factor: 0.65, style: {hour: {thick: 0.06}, hubGray: 0.06}, corr: 0.5 },
-    { city: "Regina",       tz: "America/Regina",     cx: 566,  cy: 412,  d: 130, factor: 2, style: {hour: {thick: 0.2}, hubGray: 0.2} },
-    { city: "Denver",       tz: "America/Denver",     cx: 1140, cy: 486,  d: 162, factor: 1.5, style: {hour: {thick: 0.15}, hubGray: 0.15} },
+    { city: "Vancouver",    tz: "America/Vancouver",  cx: 905,  cy: 1645, d: 320, factor: 0.9, style: {hour: {thick: 0.12}, hubHrMin: 0.1}, corr: -0.7 },
+    { city: "Los Angeles",  tz: "America/Los_Angeles",cx: 598,  cy: 983,  d: 500, factor: 0.65, style: {hour: {thick: 0.06}, hubHrMin: 0.06}, corr: 0.5 },
+    { city: "Regina",       tz: "America/Regina",     cx: 566,  cy: 412,  d: 130, factor: 2, style: {hour: {thick: 0.2}, hubHrMin: 0.2} },
+    { city: "Denver",       tz: "America/Denver",     cx: 1140, cy: 486,  d: 162, factor: 1.5, style: {hour: {thick: 0.15}, hubHrMin: 0.15} },
     { city: "Dallas",       tz: "America/Chicago",    cx: 1281, cy: 1141, d: 210, factor: 1.7, corr: 0.6 },
     { city: "Moncton",      tz: "America/Moncton",    cx: 1395, cy: 1676, d: 220, factor: 1.5 },
-    { city: "Philadelphia", tz: "America/New_York",   cx: 1920, cy: 632,  d: 636, factor: 0.85, style: {hour: {thick: 0.075}, minute: {thick: 0.035}, hubGray: 0.08, hubRed: 0.04}, second: "sweep" },
+    { city: "Philadelphia", tz: "America/New_York",   cx: 1920, cy: 632,  d: 636, factor: 0.85, style: {hour: {thick: 0.075}, minute: {thick: 0.035}, hubHrMin: 0.08, hubSec: 0.04}, second: "sweep" },
     { city: "UTC",          tz: "UTC",                cx: 1920, cy: 1478, d: 445 },
-    { city: "London",       tz: "Europe/London",      cx: 2683, cy: 527,  d: 420, factor: 0.7, style: {hour: {thick: 0.06}, hubGray: 0.065} },
-    { city: "Oslo",         tz: "Europe/Oslo",        cx: 3048, cy: 844,  d: 220, factor: 0.8, style: {hubGray: 0.08} },
+    { city: "London",       tz: "Europe/London",      cx: 2683, cy: 527,  d: 420, factor: 0.7, style: {hour: {thick: 0.06}, hubHrMin: 0.065} },
+    { city: "Oslo",         tz: "Europe/Oslo",        cx: 3048, cy: 844,  d: 220, factor: 0.8, style: {hubHrMin: 0.08} },
     { city: "Helsinki",     tz: "Europe/Helsinki",    cx: 3245, cy: 449,  d: 190, factor: 1.2, corr: 0.9 },
-    { city: "Perth",        tz: "Australia/Perth",    cx: 2509, cy: 1126, d: 290, style: {hubGray: 0.08} },
-    { city: "Adelaide",     tz: "Australia/Adelaide", cx: 2503, cy: 1605, d: 228, style: {hubGray: 0.09} },
+    { city: "Perth",        tz: "Australia/Perth",    cx: 2509, cy: 1126, d: 290, style: {hubHrMin: 0.08} },
+    { city: "Adelaide",     tz: "Australia/Adelaide", cx: 2503, cy: 1605, d: 228, style: {hubHrMin: 0.09} },
     { city: "Sydney",       tz: "Australia/Sydney",   cx: 2939, cy: 1427, d: 344, factor: 1.1 },
-    { city: "Brisbane",     tz: "Australia/Brisbane", cx: 3392, cy: 1174, d: 288, factor: 0.9, style: {hour: {thick: 0.08}, hubGray: 0.08}, corr: -0.3 },
+    { city: "Brisbane",     tz: "Australia/Brisbane", cx: 3392, cy: 1174, d: 288, factor: 0.9, style: {hour: {thick: 0.08}, hubHrMin: 0.08}, corr: -0.3 },
     { city: "Auckland",     tz: "Pacific/Auckland",   cx: 3395, cy: 1682, d: 245, factor: 1.5, corr: -0.5 },
   ];
 
+  //Default hand styles
+  //Expressed in fraction of each clock's radius
+  //Override per-clock and per-parameter via a clock's `style` object
+  //See also hr/min hand shadow in <style> block
+  const DEFAULTS = {
+    hour:   { len: 0.66, thick: 0.07, color: "#222" },
+    minute: { len: 1.00, thick: 0.05, color: "#222" },
+    second: { len: 1.00, thick: 0.02, color: "#743", cb: 0.4 },
+    hubHrMin: 0.07,
+    hubSec:  0.03,
+    factor: 1 //multiplier for hand thickness and hub-dot radius; can also be overridden by ?factor URL param for tweaking
+  };
+  
+  //Hub for clocks with no second hand, non-scaled (imitates minute arbor)
+  const PLAIN_HUB_R = 4.5;
+
+  //Warp/keyframe effect
+  //Applies to hands/debug/grid only, to match photo perspective
+  const WARP_SX = 1;
+  const WARP_SY = 1;
+  const WARP_TILT = -3.5; //rotation around x axis (at center of viewport) in degrees
+  const WARP_PERSP = 2000; //strength of the effect (i.e. "distance" to tilted plane)
+
+  ////////// End config //////////
+
+
   const SVGNS = "http://www.w3.org/2000/svg";
-  const svg = document.getElementById("hands");          // hour/minute/hubs (shadowed)
-  const svgSec = document.getElementById("hands-sec");   // second hands (no filter)
-  const dbg = DEBUG ? make("g") : null;
+  const svg = document.getElementById("hands");
+  const svgSec = document.getElementById("hands-sec");
+
+  //Utility to get a value from parameter if specified, or default
+  const num = (k, d) => (params.has(k) ? parseFloat(params.get(k)) : d);
+
+  const params  = new URLSearchParams(location.search);
+  const DEBUG   = params.has("debug");
+  const GRID    = params.has("grid");
+
+  const GRID_STEP = (() => {
+    const v = num("grid", 240);
+    return Number.isFinite(v) && v > 0 ? v : 240;
+  })();
+
+  const GLOBAL_FACTOR = num("factor", DEFAULTS.factor);
+
+  const WARP = {
+    scaleX: num("sx",    WARP_SX),
+    scaleY: num("sy",    WARP_SY),
+    tilt:   num("tilt",  WARP_TILT),
+    persp:  num("persp", WARP_PERSP),
+  };
+  const warpCss =
+    `perspective(${WARP.persp}px) rotateX(${WARP.tilt}deg) ` +
+    `scale(${WARP.scaleX}, ${WARP.scaleY})`;
+  svg.style.transform = warpCss;
+  svgSec.style.transform = warpCss;
 
   function make(tag, attrs) {
     const el = document.createElementNS(SVGNS, tag);
@@ -192,15 +138,13 @@
     return el;
   }
 
-  // Build a single hand. Uses a rotation group whose local origin is the dial
-  // center, so updating the hand is just `rotate(angle)`.
   function buildHand(spec, r, images, key) {
     const g = make("g");
     const img = images && images[key];
     if (img) {
-      // Photo hand: centered on the pivot, rotated about it.
+      //Photo hand: centered on the pivot, rotated about it
       const el = make("image", { href: img.href });
-      // The image is positioned once it loads (need natural size for centering).
+      //Wait for image to load before positioning, so we know center
       el.addEventListener("load", () => {
         const w = el.width.baseVal.value || img.width || 0;
         const h = el.height.baseVal.value || img.height || 0;
@@ -212,8 +156,8 @@
       });
       g.appendChild(el);
     } else {
-      // Drawn hand: a rounded line pointing up (12 o'clock) from the center.
-      // A counterbalance (spec.cb) extends a tail the opposite way, past center.
+      //Drawn hand: a rounded line pointing up from the center
+      //Counterbalance (spec.cb) extends a tail down from center
       const tail = (spec.cb || 0) * spec.len * r;
       g.appendChild(make("line", {
         x1: 0, y1: tail, x2: 0, y2: -spec.len * r,
@@ -225,7 +169,7 @@
     return g;
   }
 
-  // Lazily cached UTC offset (ms) per clock; refreshed to follow DST.
+  //Cached UTC offset (ms) per clock, refreshed to follow DST
   function refreshOffsets() {
     const now = new Date();
     for (const c of CLOCKS) c.offset = zoneOffsetMs(c.tz, now);
@@ -240,14 +184,12 @@
     for (const part of f.formatToParts(date)) p[part.type] = part.value;
     let hh = p.hour === "24" ? 0 : +p.hour;
     const asUTC = Date.UTC(+p.year, +p.month - 1, +p.day, hh, +p.minute, +p.second);
-    // Round to whole seconds (current-era offsets are whole minutes anyway).
+    //Round to whole seconds
     return Math.round((asUTC - date.getTime()) / 1000) * 1000;
   }
 
-  // Resolve a hand's drawn style. Overrides are merged per-property (so you can
-  // set just a color, or just a length). Thickness is the global default times
-  // the clock's width `factor` — EXCEPT when an explicit `thick` override is
-  // given, in which case that exact value is used and the factor is discarded.
+  //Resolve a hand's drawn style
+  //Overrides are merged per-property
   function handSpec(c, name, factor) {
     const base = DEFAULTS[name];
     const ov = (c.style && c.style[name]) || {};
@@ -258,12 +200,11 @@
       cb:    ov.cb    != null ? ov.cb    : base.cb,
     };
   }
-  // Scalar property (hub radius): default × factor, unless overridden explicitly
-  // (in which case the factor is discarded, mirroring hand thickness).
   const pick = (c, key, factor) =>
     (c.style && c.style[key] != null) ? c.style[key] : DEFAULTS[key] * factor;
 
-  // Build the SVG scene.
+  //Build the SVG scene
+  const dbg = DEBUG ? make("g") : null;
   const live = [];
   for (const c of CLOCKS) {
     const r = c.d / 2;
@@ -276,10 +217,9 @@
     const hourSpec   = handSpec(c, "hour",   factor);
     const minuteSpec = handSpec(c, "minute", factor);
 
-    // Shadowed layer: gray cap, hour, minute. Clocks without a second hand get a
-    // uniform center pin on top (caps the pivot, same size everywhere).
+    //Shadowed layer: hours, minutes, non-second hub
     const g = make("g", { transform: baseT });
-    g.appendChild(make("circle", { r: pick(c, "hubGray", factor) * r, fill: hourSpec.color }));
+    g.appendChild(make("circle", { r: pick(c, "hubHrMin", factor) * r, fill: hourSpec.color }));
     const hour   = buildHand(hourSpec,   r, c.images, "hour");
     const minute = buildHand(minuteSpec, r, c.images, "minute");
     g.appendChild(hour);
@@ -288,14 +228,14 @@
       g.appendChild(make("circle", { r: PLAIN_HUB_R, fill: "#333" }));
     svg.appendChild(g);
 
-    // Unfiltered layer: the sweeping second hand + its red center cap on top.
+    //Unfiltered layer: seconds and second hub
     let second = null;
     if (hasSecond) {
       const secondSpec = handSpec(c, "second", factor);
       const gs = make("g", { transform: baseT });
       second = buildHand(secondSpec, r, c.images, "second");
       gs.appendChild(second);
-      gs.appendChild(make("circle", { r: pick(c, "hubRed", factor) * r, fill: secondSpec.color }));
+      gs.appendChild(make("circle", { r: pick(c, "hubSec", factor) * r, fill: secondSpec.color }));
       svgSec.appendChild(gs);
     }
     live.push({ c, hour, minute, second, tick: c.second === "tick" });
@@ -309,13 +249,12 @@
       dbg.appendChild(label);
     }
   }
-  if (DEBUG) svgSec.appendChild(dbg);  // unfiltered layer: crisp, no drop shadow
+  if (DEBUG) svgSec.appendChild(dbg);
 
-  // Alignment grid (?grid). Drawn in the (unfiltered) hands layer so it warps
-  // with them but stays crisp.
+  //Alignment grid (?grid)
   if (GRID) {
     const W = 3840, H = 2160, gg = make("g");
-    // Dim the wall behind the grid so the green lines stand out.
+    //Dim the wall behind the grid so the green lines stand out
     gg.appendChild(make("rect", { x: 0, y: 0, width: W, height: H, fill: "#000", opacity: 0.2 }));
     for (let x = 0; x <= W; x += GRID_STEP) {
       gg.appendChild(make("line", { class: "grid-line", x1: x, y1: 0, x2: x, y2: H }));
@@ -329,25 +268,22 @@
       t.textContent = Math.round(y);
       gg.appendChild(t);
     }
-    // Emphasized center axes (always at the true wall center).
+    //Emphasized center axes
     gg.appendChild(make("line", { class: "grid-axis", x1: W / 2, y1: 0, x2: W / 2, y2: H }));
     gg.appendChild(make("line", { class: "grid-axis", x1: 0, y1: H / 2, x2: W, y2: H / 2 }));
     svgSec.appendChild(gg);
   }
 
-  // Apply a rotation only when it actually changed (cheap DOM writes).
+  //Apply a rotation only when it actually changed
   function setRot(g, angle) {
     if (!g || g._a === angle) return;
     g._a = angle;
     g.setAttribute("transform", `rotate(${angle})`);
   }
 
-  // Animation loop. Per your spec & to keep DOM writes minimal:
-  //   - second hand: sweeps every frame (or steps each second when tick)
-  //   - minute hand: advances once per whole second
-  //   - hour hand:   advances once per 30 seconds
-  // SVG transforms are GPU-composited, so even all-frames updates are cheap;
-  // the quantization above just trims redundant writes.
+  //Animation loop
+  //To minimize DOM writes, each hand is moved only when it would be perceptible
+  //SVG transforms are GPU-composited (vs. p5/canvas manual work)
   function frame() {
     const now = Date.now();
     for (const it of live) {
@@ -355,19 +291,20 @@
       const ms = ((t % 86400000) + 86400000) % 86400000;
       const sFloor = Math.floor(ms / 1000);
 
-      const secVal = it.tick ? sFloor : ms / 1000;      // stepped or smooth
-      const minVal = sFloor / 60;                       // updates each second
-      const hrVal  = (Math.floor(sFloor / 30) * 30) / 3600; // updates each 30s
+      const secVal = it.tick ? sFloor : ms / 1000; //per tick or smooth
+      const minVal = sFloor / 60; //updates each second
+      const hrVal  = (Math.floor(sFloor / 30) * 30) / 3600; //updates each 30s
 
-      setRot(it.second, (secVal % 60) * 6);             // 360/60 (null = skipped)
-      setRot(it.minute, (minVal % 60) * 6);             // 360/60
-      setRot(it.hour,   (hrVal % 12) * 30);             // 360/12
+      setRot(it.second, (secVal % 60) * 6);
+      setRot(it.minute, (minVal % 60) * 6);
+      setRot(it.hour,   (hrVal % 12) * 30);
     }
     requestAnimationFrame(frame);
   }
 
   refreshOffsets();
-  setInterval(refreshOffsets, 5 * 60 * 1000); // re-check DST periodically
+  setInterval(refreshOffsets, 5 * 60 * 1000);
+
   requestAnimationFrame(frame);
 })();
 </script>
