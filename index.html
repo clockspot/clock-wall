@@ -67,11 +67,29 @@
 "use strict";
 (function () {
   // ---- Options (URL flags) -------------------------------------------------
-  //   ?tick   -> second hand steps once per second instead of sweeping
   //   ?debug  -> draw dial outlines / centers / labels to validate placement
   const params  = new URLSearchParams(location.search);
-  const SWEEP   = !params.has("tick");
   const DEBUG   = params.has("debug");
+
+  // ---- Overall warp / keyframe effect --------------------------------------
+  // A single transform applied to the whole stage (all three layers tilt &
+  // scale together and stay aligned). Tweak the defaults here, or experiment
+  // live via URL params, e.g.  ?sx=1.04&sy=0.96&tilt=5&persp=1600
+  //   scaleX / scaleY : non-uniform x/y scaling
+  //   tilt            : rotateX degrees — leans the top away, for the
+  //                     slightly-downward camera angle
+  //   persp           : perspective distance in px (smaller = stronger 3D)
+  const num = (k, d) => (params.has(k) ? parseFloat(params.get(k)) : d);
+  const WARP = {
+    scaleX: num("sx",    1),
+    scaleY: num("sy",    1),
+    tilt:   num("tilt",  0),
+    persp:  num("persp", 2000),
+  };
+  // Prepended translate keeps the stage centered (see #stage rule in CSS).
+  document.getElementById("stage").style.transform =
+    `translate(-50%, -50%) perspective(${WARP.persp}px) ` +
+    `rotateX(${WARP.tilt}deg) scale(${WARP.scaleX}, ${WARP.scaleY})`;
 
   // ---- Default hand styling (fractions of each clock's radius) -------------
   // Override any of these per-clock via a clock's `style` object.
@@ -81,35 +99,36 @@
     second: { len: 1.00, thick: 0.01, color: "#a33" },
     hubGray: 0.05,   // gray center dot radius
     hubRed:  0.03,   // red center dot radius (only when a second hand exists)
-    second_enabled: true,
   };
 
   // ---- The wall ------------------------------------------------------------
-  // x,y = top-left of the dial's bounding box (image pixels); d = diameter.
-  // corr = straightness correction in degrees, +clockwise / -counterclockwise.
-  // tz   = IANA zone. style = optional per-clock overrides (see DEFAULTS).
+  // cx,cy = dial CENTER (image pixels); d = diameter.
+  // corr  = straightness correction in degrees, +clockwise / -counterclockwise.
+  // tz    = IANA zone. style = optional per-clock overrides (see DEFAULTS).
+  // second = "sweep" (smooth) or "tick" (steps each second) to give a clock a
+  //          red second hand; omit for no second hand (the default).
   // To use a photo hand instead of a drawn one, add e.g.
   //   images: { minute: { href: "hands/min.png", pivot: 0.5 } }
   // (pivot = fraction of the image height between the rotation center and the
   //  far tip; 0.5 means the pivot is at the image's middle.)
   const CLOCKS = [
-    { city: "Honolulu",     tz: "Pacific/Honolulu",   x: 284,  y: 1522, d: 652 },
-    { city: "Vancouver",    tz: "America/Vancouver",  x: 750,  y: 1480, d: 320, corr: -0.7 },
-    { city: "Los Angeles",  tz: "America/Los_Angeles",x: 343,  y: 731,  d: 500 },
-    { city: "Regina",       tz: "America/Regina",     x: 486,  y: 339,  d: 140 },
-    { city: "Denver",       tz: "America/Denver",     x: 1051, y: 398,  d: 168 },
-    { city: "Dallas",       tz: "America/Chicago",    x: 1173, y: 1030, d: 220, corr: 0.6 },
-    { city: "Moncton",      tz: "America/Moncton",    x: 1288, y: 1563, d: 220 },
-    { city: "Philadelphia", tz: "America/New_York",   x: 1595, y: 303,  d: 325 },
-    { city: "UTC",          tz: "UTC",                x: 1698, y: 1254, d: 444 },
-    { city: "London",       tz: "Europe/London",      x: 2474, y: 307,  d: 430 },
-    { city: "Oslo",         tz: "Europe/Oslo",        x: 2940, y: 732,  d: 224 },
-    { city: "Helsinki",     tz: "Europe/Helsinki",    x: 3159, y: 346,  d: 194, corr: 0.9 },
-    { city: "Perth",        tz: "Australia/Perth",    x: 2362, y: 982,  d: 290 },
-    { city: "Adelaide",     tz: "Australia/Adelaide", x: 2384, y: 1485, d: 230 },
-    { city: "Sydney",       tz: "Australia/Sydney",   x: 2763, y: 1253, d: 344 },
-    { city: "Brisbane",     tz: "Australia/Brisbane", x: 3247, y: 1030, d: 288 },
-    { city: "Auckland",     tz: "Pacific/Auckland",   x: 3260, y: 1552, d: 250 },
+    { city: "Honolulu",     tz: "Pacific/Honolulu",   cx: 422,  cy: 1660, d: 276 },
+    { city: "Vancouver",    tz: "America/Vancouver",  cx: 910,  cy: 1640, d: 320, corr: -0.7 },
+    { city: "Los Angeles",  tz: "America/Los_Angeles",cx: 593,  cy: 981,  d: 500 },
+    { city: "Regina",       tz: "America/Regina",     cx: 556,  cy: 409,  d: 140 },
+    { city: "Denver",       tz: "America/Denver",     cx: 1135, cy: 482,  d: 168 },
+    { city: "Dallas",       tz: "America/Chicago",    cx: 1283, cy: 1140, d: 220, corr: 0.6 },
+    { city: "Moncton",      tz: "America/Moncton",    cx: 1398, cy: 1673, d: 220 },
+    { city: "Philadelphia", tz: "America/New_York",   cx: 1920, cy: 628,  d: 650, second: "sweep" },
+    { city: "UTC",          tz: "UTC",                cx: 1920, cy: 1476, d: 444 },
+    { city: "London",       tz: "Europe/London",      cx: 2689, cy: 522,  d: 430 },
+    { city: "Oslo",         tz: "Europe/Oslo",        cx: 3052, cy: 844,  d: 224 },
+    { city: "Helsinki",     tz: "Europe/Helsinki",    cx: 3256, cy: 443,  d: 194, corr: 0.9 },
+    { city: "Perth",        tz: "Australia/Perth",    cx: 2507, cy: 1127, d: 290 },
+    { city: "Adelaide",     tz: "Australia/Adelaide", cx: 2499, cy: 1600, d: 230 },
+    { city: "Sydney",       tz: "Australia/Sydney",   cx: 2935, cy: 1425, d: 344 },
+    { city: "Brisbane",     tz: "Australia/Brisbane", cx: 3391, cy: 1174, d: 288 },
+    { city: "Auckland",     tz: "Pacific/Auckland",   cx: 3385, cy: 1677, d: 250 },
   ];
 
   const SVGNS = "http://www.w3.org/2000/svg";
@@ -176,9 +195,10 @@
   const live = [];
   for (const c of CLOCKS) {
     const r = c.d / 2;
-    const cx = c.x + r, cy = c.y + r;
+    const cx = c.cx, cy = c.cy;
     const st = Object.assign({}, DEFAULTS, c.style);
     const corr = c.corr || 0;
+    const hasSecond = !!c.second;
 
     const g = make("g", { transform: `translate(${cx},${cy}) rotate(${corr})` });
     const hour   = buildHand(st.hour,   r, c.images, "hour");
@@ -187,16 +207,16 @@
     g.appendChild(minute);
 
     let second = null;
-    if (st.second_enabled) {
+    if (hasSecond) {
       second = buildHand(st.second, r, c.images, "second");
       g.appendChild(second);
     }
     g.appendChild(make("circle", { r: st.hubGray * r, fill: st.hour.color }));
-    if (st.second_enabled)
+    if (hasSecond)
       g.appendChild(make("circle", { r: st.hubRed * r, fill: st.second.color }));
 
     svg.appendChild(g);
-    live.push({ c, hour, minute, second });
+    live.push({ c, hour, minute, second, tick: c.second === "tick" });
 
     if (DEBUG) {
       dbg.appendChild(make("circle", { class: "dbg-circle", cx, cy, r }));
@@ -217,7 +237,7 @@
   }
 
   // Animation loop. Per your spec & to keep DOM writes minimal:
-  //   - second hand: sweeps every frame (or steps each second with ?tick)
+  //   - second hand: sweeps every frame (or steps each second when tick)
   //   - minute hand: advances once per whole second
   //   - hour hand:   advances once per 30 seconds
   // SVG transforms are GPU-composited, so even all-frames updates are cheap;
@@ -229,11 +249,11 @@
       const ms = ((t % 86400000) + 86400000) % 86400000;
       const sFloor = Math.floor(ms / 1000);
 
-      const secVal = SWEEP ? ms / 1000 : sFloor;       // smooth or stepped
+      const secVal = it.tick ? sFloor : ms / 1000;      // stepped or smooth
       const minVal = sFloor / 60;                       // updates each second
       const hrVal  = (Math.floor(sFloor / 30) * 30) / 3600; // updates each 30s
 
-      setRot(it.second, (secVal % 60) * 6);             // 360/60
+      setRot(it.second, (secVal % 60) * 6);             // 360/60 (null = skipped)
       setRot(it.minute, (minVal % 60) * 6);             // 360/60
       setRot(it.hour,   (hrVal % 12) * 30);             // 360/12
     }

@@ -31,7 +31,9 @@ You can also just open `index.html` in any browser to preview.
 
 - `?debug` — overlays each dial's outline, center crosshair, and city label.
   Use this to validate the placement/sizing of every clock.
-- `?tick` — second hands step once per second instead of sweeping smoothly.
+- Warp / keyframe params for live experimentation (see "Overall warp" below):
+  `?sx=`, `?sy=` (x/y scale), `?tilt=` (rotateX degrees), `?persp=` (perspective px).
+  Example: `index.html?sx=1.04&sy=0.96&tilt=5`.
 
 ## How the hands are drawn
 
@@ -49,7 +51,7 @@ Two approaches were considered:
 
 One `requestAnimationFrame` loop drives everything. To minimize DOM writes:
 
-- second hands sweep every frame,
+- second hands sweep every frame (only Philadelphia has one by default),
 - minute hands advance once per whole second,
 - hour hands advance once per 30 seconds,
 
@@ -65,19 +67,30 @@ every 5 minutes so DST transitions are handled automatically.
 
 Everything lives in the `<script>` in `index.html`:
 
-- `CLOCKS` — one entry per clock: `city`, IANA `tz`, top-left `x`,`y`, diameter
-  `d`, optional straightness `corr` (degrees, + clockwise / − counterclockwise).
-  Dial **center** is computed as `(x + d/2, y + d/2)`.
+- `CLOCKS` — one entry per clock: `city`, IANA `tz`, dial **center** `cx`,`cy`,
+  diameter `d`, optional straightness `corr` (degrees, + clockwise / −
+  counterclockwise). Coordinates and diameter are in native image pixels
+  (3840×2160). Open `index.html?debug` to verify the green outlines sit on the
+  real dials.
+- Second hands are **off by default**. Give a clock a red second hand by adding
+  `second: "sweep"` (smooth) or `second: "tick"` (steps each second). Only
+  Philadelphia has one out of the box.
 - `DEFAULTS` — hand lengths/thicknesses (as fractions of each dial's radius) and
   colors. Override per clock with a `style: { ... }` object.
 - Per-clock photo hands: add `images: { hour|minute|second: { href, pivot } }`,
   where `pivot` is the fraction of the image height from the rotation center to
   the far tip (0.5 = pivot at the image's middle).
 
-### A placement assumption to confirm
+### Overall warp / keyframe effect
 
-The clock list was given as "x/y from top left, diameter". This is read as the
-**top-left corner of each dial's bounding box**, so the center is `x + d/2`,
-`y + d/2`. Open `index.html?debug` to verify the green outlines sit on the real
-dials. If your `x,y` were actually the dial *centers*, change the two lines in the
-build loop from `c.x + r, c.y + r` to `c.x, c.y`.
+The whole stage (all three layers) shares one CSS transform, so you can lean or
+stretch the entire wall without anything drifting out of alignment — handy for
+matching the slightly-downward camera angle. Edit the `WARP` defaults in
+`index.html`, or experiment live with the URL params above:
+
+- `scaleX` / `scaleY` (`?sx` / `?sy`) — non-uniform x/y scaling.
+- `tilt` (`?tilt`) — `rotateX` degrees, leaning the top away from the viewer.
+- `persp` (`?persp`) — perspective distance in px (smaller = stronger 3D).
+
+At the defaults (`tilt: 0`, `scale 1`) the transform is visually identity, so the
+wall renders flat until you dial something in.
