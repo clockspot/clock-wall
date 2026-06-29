@@ -49,7 +49,7 @@
     /* Very light, very diffuse shadow the hands cast onto the dials. Applied to
        the whole layer, so it follows the alpha of every hand (and hub) for free.
        Tune: drop-shadow(<offX> <offY> <blur> <color>). */
-    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.2));
+    filter: drop-shadow(0 1px 4px rgba(27, 30, 25, 0.4));
   }
 
   /* Debug overlay (enable with ?debug): dial outlines, centers, labels. */
@@ -122,10 +122,10 @@
 //     hubRed:  0.01,   // red center dot radius (only when a second hand exists)
 //   };
   const DEFAULTS = {
-    hour:   { len: 0.66, thick: 0.08, color: "#222" },
+    hour:   { len: 0.66, thick: 0.07, color: "#222" },
     minute: { len: 1.00, thick: 0.05, color: "#222" },
-    second: { len: 1.00, thick: 0.02, color: "#954" },
-    hubGray: 0.08,   // gray center dot radius
+    second: { len: 1.00, thick: 0.02, color: "#743" },
+    hubGray: 0.07,   // gray center dot radius
     hubRed:  0.03,   // red center dot radius (only when a second hand exists)
     // Hand-WIDTH factor: multiplies every hand thickness AND hub-dot radius.
     // Because those are fractions of each dial's radius, big dials get fat hands
@@ -149,23 +149,23 @@
   // (pivot = fraction of the image height between the rotation center and the
   //  far tip; 0.5 means the pivot is at the image's middle.)
   const CLOCKS = [
-    { city: "Honolulu",     tz: "Pacific/Honolulu",   cx: 413,  cy: 1664, d: 275 },
-    { city: "Vancouver",    tz: "America/Vancouver",  cx: 905,  cy: 1645, d: 320, corr: -0.7 },
-    { city: "Los Angeles",  tz: "America/Los_Angeles",cx: 598,  cy: 983,  d: 500, corr: 0.5 },
-    { city: "Regina",       tz: "America/Regina",     cx: 565,  cy: 412,  d: 140 },
-    { city: "Denver",       tz: "America/Denver",     cx: 1140, cy: 486,  d: 165 },
-    { city: "Dallas",       tz: "America/Chicago",    cx: 1281, cy: 1141, d: 218, corr: 0.6 },
-    { city: "Moncton",      tz: "America/Moncton",    cx: 1395, cy: 1676, d: 220 },
-    { city: "Philadelphia", tz: "America/New_York",   cx: 1920, cy: 633,  d: 646, second: "sweep" },
+    { city: "Honolulu",     tz: "Pacific/Honolulu",   cx: 412,  cy: 1665, d: 272, factor: 1.8 },
+    { city: "Vancouver",    tz: "America/Vancouver",  cx: 905,  cy: 1645, d: 320, factor: 0.9, style: {hour: {thick: 0.12}, hubGray: 0.1}, corr: -0.7 },
+    { city: "Los Angeles",  tz: "America/Los_Angeles",cx: 598,  cy: 983,  d: 500, factor: 0.65, style: {hour: {thick: 0.06}, hubGray: 0.06}, corr: 0.5 },
+    { city: "Regina",       tz: "America/Regina",     cx: 566,  cy: 412,  d: 130, factor: 2, style: {hour: {thick: 0.2}, hubGray: 0.2} },
+    { city: "Denver",       tz: "America/Denver",     cx: 1140, cy: 486,  d: 162, factor: 1.5, style: {hour: {thick: 0.15}, hubGray: 0.15} },
+    { city: "Dallas",       tz: "America/Chicago",    cx: 1281, cy: 1141, d: 210, factor: 1.7, corr: 0.6 },
+    { city: "Moncton",      tz: "America/Moncton",    cx: 1395, cy: 1676, d: 220, factor: 1.5 },
+    { city: "Philadelphia", tz: "America/New_York",   cx: 1920, cy: 632,  d: 636, factor: 0.85, style: {hour: {thick: 0.075}, minute: {thick: 0.035}, hubGray: 0.08, hubRed: 0.04}, second: "sweep" },
     { city: "UTC",          tz: "UTC",                cx: 1920, cy: 1478, d: 445 },
-    { city: "London",       tz: "Europe/London",      cx: 2684, cy: 526,  d: 430 },
-    { city: "Oslo",         tz: "Europe/Oslo",        cx: 3048, cy: 845,  d: 224 },
-    { city: "Helsinki",     tz: "Europe/Helsinki",    cx: 3245, cy: 449,  d: 190, corr: 0.9 },
-    { city: "Perth",        tz: "Australia/Perth",    cx: 2509, cy: 1126, d: 290 },
-    { city: "Adelaide",     tz: "Australia/Adelaide", cx: 2503, cy: 1604, d: 228 },
-    { city: "Sydney",       tz: "Australia/Sydney",   cx: 2938, cy: 1426, d: 344 },
-    { city: "Brisbane",     tz: "Australia/Brisbane", cx: 3392, cy: 1174, d: 288, corr: -0.3 },
-    { city: "Auckland",     tz: "Pacific/Auckland",   cx: 3395, cy: 1682, d: 250, corr: -0.5 },
+    { city: "London",       tz: "Europe/London",      cx: 2683, cy: 527,  d: 420, factor: 0.7, style: {hour: {thick: 0.06}, hubGray: 0.065} },
+    { city: "Oslo",         tz: "Europe/Oslo",        cx: 3048, cy: 844,  d: 220, factor: 0.8, style: {hubGray: 0.08} },
+    { city: "Helsinki",     tz: "Europe/Helsinki",    cx: 3245, cy: 449,  d: 190, factor: 1.2, corr: 0.9 },
+    { city: "Perth",        tz: "Australia/Perth",    cx: 2509, cy: 1126, d: 290, style: {hubGray: 0.08} },
+    { city: "Adelaide",     tz: "Australia/Adelaide", cx: 2503, cy: 1605, d: 228, style: {hubGray: 0.09} },
+    { city: "Sydney",       tz: "Australia/Sydney",   cx: 2939, cy: 1427, d: 344, factor: 1.1 },
+    { city: "Brisbane",     tz: "Australia/Brisbane", cx: 3392, cy: 1174, d: 288, factor: 0.9, style: {hour: {thick: 0.08}, hubGray: 0.08}, corr: -0.3 },
+    { city: "Auckland",     tz: "Pacific/Auckland",   cx: 3395, cy: 1682, d: 245, factor: 1.5, corr: -0.5 },
   ];
 
   const SVGNS = "http://www.w3.org/2000/svg";
