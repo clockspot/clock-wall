@@ -97,7 +97,7 @@
   const WARP_SX = 1;
   const WARP_SY = 1;
   const WARP_TILT = -3.5; //rotation around x axis (at center of viewport) in degrees
-  const WARP_PERSP = 2000; //strength of the effect (i.e. "distance" to tilted plane)
+  const WARP_PERSP = 2000; //"distance" to the tilted plane, in IMAGE pixels (viewBox units); converted to CSS px from the current render size, so the effect is independent of viewport size / zoom
 
   ////////// End config //////////
 
@@ -126,11 +126,22 @@
     tilt:   num("tilt",  WARP_TILT),
     persp:  num("persp", WARP_PERSP),
   };
-  const warpCss =
-    `perspective(${WARP.persp}px) rotateX(${WARP.tilt}deg) ` +
-    `scale(${WARP.scaleX}, ${WARP.scaleY})`;
-  svg.style.transform = warpCss;
-  svgSec.style.transform = warpCss;
+  //WARP.persp is in image pixels. CSS perspective() wants CSS px, and the layer
+  //renders at a viewport-dependent size, so convert using the current render
+  //width (vs the 3840px-wide image). This keeps the perspective strength tied to
+  //the image rather than to viewport size / browser zoom. Re-run on resize.
+  const stage = document.getElementById("stage");
+  function applyWarp() {
+    const renderW = stage.getBoundingClientRect().width; //layout CSS px (tracks zoom)
+    const perspPx = WARP.persp * (renderW / 3840);
+    const css =
+      `perspective(${perspPx}px) rotateX(${WARP.tilt}deg) ` +
+      `scale(${WARP.scaleX}, ${WARP.scaleY})`;
+    svg.style.transform = css;
+    svgSec.style.transform = css;
+  }
+  applyWarp();
+  addEventListener("resize", applyWarp);
 
   function make(tag, attrs) {
     const el = document.createElementNS(SVGNS, tag);
