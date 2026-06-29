@@ -17,7 +17,7 @@
 
   /* Define hour/minute hand drop shadow here */
   /* drop-shadow(<offX> <offY> <blur> <color>) */
-  #hands { filter: drop-shadow(0 1px 4px rgba(27, 30, 25, 0.4)); }
+  #hands { filter: drop-shadow(0 1px 4px rgba(66, 66, 55, 0.35)); }
 
   /* Debug overlay (enable with ?debug) */
   .dbg-circle { fill: none; stroke: #0f0; stroke-width: 2; opacity: .8; }
@@ -38,6 +38,29 @@
     <img id="fg" src="fg.png" alt="">
   </div>
 
+  <!-- Hand art sprite sheet: in-document <symbol>s referenced by clocks' svg.href (e.g. "#london-hour"). Author each so its rotation hub sits at the center of its viewBox. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"
+       xmlns="http://www.w3.org/2000/svg">
+    <symbol id="london-hour" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="matrix(0.0552043,-1.06777e-19,1.06777e-19,0.0552043,1073.94,1078.48)">
+        <circle cx="1941.19" cy="1858.98" r="1390.68" style="fill:rgb(26,27,25);"/>
+      </g>
+      <g transform="matrix(-0.460558,5.64021e-17,-5.04275e-17,-0.411772,1724.61,1666.69)">
+        <path d="M330.396,1127.03L1189.51,1127.03L1189.51,1231.51L330.396,1231.51C321.28,1267.51 289.062,1361.34 195.7,1393.8C80.116,1433.98 -6.68,1350.06 -70.147,1295.95C-131.825,1243.38 -193.084,1215.98 -265.732,1215.98C-337.774,1215.98 -376.642,1243.79 -376.642,1243.79L-379.723,1246.01L-438.921,1179.27L-379.723,1112.53L-376.642,1114.75C-376.642,1114.75 -337.774,1142.56 -265.732,1142.56C-193.084,1142.56 -131.825,1115.16 -70.147,1062.58C-6.68,1008.48 80.116,924.559 195.7,964.74C289.062,997.196 321.28,1091.03 330.396,1127.03Z" style="fill:rgb(26,27,25);"/>
+      </g>
+    </symbol>
+    <symbol id="london-minute" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="matrix(1,0,0,1,-1.77636e-15,-0.0756048)">
+        <g transform="matrix(5.92626e-17,0.967832,-0.411772,2.52138e-17,1666.69,38.2642)">
+          <path d="M85.672,1180.13L108.785,1127.03L1189.51,1127.03L1189.51,1231.51L108.785,1231.51L85.672,1180.13Z" style="fill:rgb(26,27,25);"/>
+        </g>
+        <g transform="matrix(0.0424649,4.45037e-18,-4.45037e-18,0.0424649,1098.67,1102.16)">
+          <circle cx="1941.19" cy="1858.98" r="1390.68" style="fill:rgb(26,27,25);"/>
+        </g>
+      </g>
+    </symbol>
+  </svg>
+
 <script>
 "use strict";
 (function () {
@@ -53,9 +76,17 @@
   //style  = per-clock/per-property overrides of DEFAULTS below
   //corr   = straightness correction in degrees, +clockwise / -counterclockwise
   //second = "sweep" or "tick"
-  //images = to use a photo hand instead of a drawn one, add e.g.:
-  //  images: { minute: { href: "hands/min.png", pivot: 0.5 } }
-  //  (pivot = fraction of the image height between the rotation center and the far tip; 0.5 means the pivot is at the image's middle)
+  //svg    = to use a drawn SVG hand instead of the built-in line, add e.g.:
+  //  svg: { minute: { href: "#my-minute", scale: 1, angle: 0 } }
+  //  href references an in-document <symbol> (see the sprite sheet below <body>);
+  //  the art is pivoted on the symbol's viewBox center (author the hand so its
+  //  rotation hub sits at the center of the viewBox).
+  //  scale = size as a fraction of the clock radius; the half-viewBox maps to
+  //          scale * radius (1 reaches the dial edge). Default 1.
+  //  angle = degrees to rotate the art so it points "up" at rest (12 o'clock),
+  //          +clockwise. Default 0.
+  //  When svg hands are used, the hour/minute hub dot is not drawn unless the
+  //  clock's style explicitly sets hubHrMin.
   const CLOCKS = [
     { city: "Honolulu",     tz: "Pacific/Honolulu",   cx: 412,  cy: 1665, d: 272, factor: 1.8 },
     { city: "Vancouver",    tz: "America/Vancouver",  cx: 905,  cy: 1645, d: 320, factor: 0.9, style: {hour: {thick: 0.12}, hubHrMin: 0.1}, corr: -0.7 },
@@ -66,7 +97,10 @@
     { city: "Moncton",      tz: "America/Moncton",    cx: 1395, cy: 1676, d: 220, factor: 1.5 },
     { city: "Philadelphia", tz: "America/New_York",   cx: 1920, cy: 632,  d: 636, factor: 0.85, style: {hour: {thick: 0.075}, minute: {thick: 0.035}, hubHrMin: 0.08, hubSec: 0.04}, second: "sweep" },
     { city: "UTC",          tz: "UTC",                cx: 1920, cy: 1478, d: 445 },
-    { city: "London",       tz: "Europe/London",      cx: 2683, cy: 527,  d: 420, factor: 0.7, style: {hour: {thick: 0.06}, hubHrMin: 0.065} },
+    { city: "London",       tz: "Europe/London",      cx: 2683, cy: 527,  d: 420, svg: {
+      minute: { href: "#london-minute", scale: 1.12, angle: 0 },
+      hour: { href: "#london-hour", scale: 1.12, angle: -90 }
+    } },
     { city: "Oslo",         tz: "Europe/Oslo",        cx: 3048, cy: 844,  d: 220, factor: 0.8, style: {hubHrMin: 0.08} },
     { city: "Helsinki",     tz: "Europe/Helsinki",    cx: 3245, cy: 449,  d: 190, factor: 1.2, corr: 0.9 },
     { city: "Perth",        tz: "Australia/Perth",    cx: 2509, cy: 1126, d: 290, style: {hubHrMin: 0.08} },
@@ -149,23 +183,21 @@
     return el;
   }
 
-  function buildHand(spec, r, images, key) {
+  function buildHand(spec, r, art, key) {
     const g = make("g");
-    const img = images && images[key];
-    if (img) {
-      //Photo hand: centered on the pivot, rotated about it
-      const el = make("image", { href: img.href });
-      //Wait for image to load before positioning, so we know center
-      el.addEventListener("load", () => {
-        const w = el.width.baseVal.value || img.width || 0;
-        const h = el.height.baseVal.value || img.height || 0;
-        const pivot = img.pivot != null ? img.pivot : 0.5;
-        el.setAttribute("x", -w / 2);
-        el.setAttribute("y", -h * pivot);
-        el.setAttribute("width", w);
-        el.setAttribute("height", h);
-      });
-      g.appendChild(el);
+    const a = art && art[key];
+    if (a) {
+      //SVG hand: an in-document <symbol> instanced via <use>, pivoted on its
+      //viewBox center. The square box spans scale*radius from the center, so the
+      //art's viewBox center sits at the origin and scale=1 reaches the dial edge.
+      //`angle` rotates the art to point up at rest; the clock animation rotates `g`.
+      const scale = a.scale != null ? a.scale : 1;
+      const w = 2 * scale * r;
+      const holder = make("g", { transform: `rotate(${a.angle || 0})` });
+      holder.appendChild(make("use", {
+        href: a.href, x: -w / 2, y: -w / 2, width: w, height: w,
+      }));
+      g.appendChild(holder);
     } else {
       //Drawn hand: a rounded line pointing up from the center
       //Counterbalance (spec.cb) extends a tail down from center
@@ -229,10 +261,14 @@
     const minuteSpec = handSpec(c, "minute", factor);
 
     //Shadowed layer: hours, minutes, non-second hub
+    //SVG hands carry their own hub, so skip the drawn one unless hubHrMin is set
     const g = make("g", { transform: baseT });
-    g.appendChild(make("circle", { r: pick(c, "hubHrMin", factor) * r, fill: hourSpec.color }));
-    const hour   = buildHand(hourSpec,   r, c.images, "hour");
-    const minute = buildHand(minuteSpec, r, c.images, "minute");
+    const svgHand = c.svg && (c.svg.hour || c.svg.minute);
+    const hubExplicit = c.style && c.style.hubHrMin != null;
+    if (!svgHand || hubExplicit)
+      g.appendChild(make("circle", { r: pick(c, "hubHrMin", factor) * r, fill: hourSpec.color }));
+    const hour   = buildHand(hourSpec,   r, c.svg, "hour");
+    const minute = buildHand(minuteSpec, r, c.svg, "minute");
     g.appendChild(hour);
     g.appendChild(minute);
     if (!hasSecond)
@@ -244,7 +280,7 @@
     if (hasSecond) {
       const secondSpec = handSpec(c, "second", factor);
       const gs = make("g", { transform: baseT });
-      second = buildHand(secondSpec, r, c.images, "second");
+      second = buildHand(secondSpec, r, c.svg, "second");
       gs.appendChild(second);
       gs.appendChild(make("circle", { r: pick(c, "hubSec", factor) * r, fill: secondSpec.color }));
       svgSec.appendChild(gs);
