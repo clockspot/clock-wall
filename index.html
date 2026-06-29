@@ -115,9 +115,9 @@
 //     hubRed:  0.01,   // red center dot radius (only when a second hand exists)
 //   };
   const DEFAULTS = {
-    hour:   { len: 0.66, thick: 0.08, color: "#333" },
-    minute: { len: 1.00, thick: 0.05, color: "#333" },
-    second: { len: 1.00, thick: 0.02, color: "#a33" },
+    hour:   { len: 0.66, thick: 0.08, color: "#222" },
+    minute: { len: 1.00, thick: 0.05, color: "#222" },
+    second: { len: 1.00, thick: 0.02, color: "#954" },
     hubGray: 0.08,   // gray center dot radius
     hubRed:  0.03,   // red center dot radius (only when a second hand exists)
   };
@@ -222,6 +222,7 @@
     const hasSecond = !!c.second;
 
     const g = make("g", { transform: `translate(${cx},${cy}) rotate(${corr})` });
+    g.appendChild(make("circle", { r: st.hubGray * r, fill: st.hour.color }));
     const hour   = buildHand(st.hour,   r, c.images, "hour");
     const minute = buildHand(st.minute, r, c.images, "minute");
     g.appendChild(hour);
@@ -232,7 +233,6 @@
       second = buildHand(st.second, r, c.images, "second");
       g.appendChild(second);
     }
-    g.appendChild(make("circle", { r: st.hubGray * r, fill: st.hour.color }));
     if (hasSecond)
       g.appendChild(make("circle", { r: st.hubRed * r, fill: st.second.color }));
 
