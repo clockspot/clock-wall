@@ -96,7 +96,7 @@
   const WARP = {
     scaleX: num("sx",    1),
     scaleY: num("sy",    1),
-    tilt:   num("tilt",  0),
+    tilt:   num("tilt",  -3.5),
     persp:  num("persp", 2000),
   };
   // transform-origin defaults to the layer's center (= wall center), so the
@@ -107,11 +107,18 @@
 
   // ---- Default hand styling (fractions of each clock's radius) -------------
   // Override any of these per-clock via a clock's `style` object.
+//   const DEFAULTS = {
+//     hour:   { len: 0.66, thick: 0.01, color: "#333" },
+//     minute: { len: 1.00, thick: 0.01, color: "#333" },
+//     second: { len: 1.00, thick: 0.01, color: "#a33" },
+//     hubGray: 0.01,   // gray center dot radius
+//     hubRed:  0.01,   // red center dot radius (only when a second hand exists)
+//   };
   const DEFAULTS = {
-    hour:   { len: 0.66, thick: 0.05, color: "#333" },
-    minute: { len: 1.00, thick: 0.02, color: "#333" },
-    second: { len: 1.00, thick: 0.01, color: "#a33" },
-    hubGray: 0.05,   // gray center dot radius
+    hour:   { len: 0.66, thick: 0.08, color: "#333" },
+    minute: { len: 1.00, thick: 0.05, color: "#333" },
+    second: { len: 1.00, thick: 0.02, color: "#a33" },
+    hubGray: 0.08,   // gray center dot radius
     hubRed:  0.03,   // red center dot radius (only when a second hand exists)
   };
 
@@ -126,23 +133,23 @@
   // (pivot = fraction of the image height between the rotation center and the
   //  far tip; 0.5 means the pivot is at the image's middle.)
   const CLOCKS = [
-    { city: "Honolulu",     tz: "Pacific/Honolulu",   cx: 422,  cy: 1660, d: 276 },
-    { city: "Vancouver",    tz: "America/Vancouver",  cx: 910,  cy: 1640, d: 320, corr: -0.7 },
-    { city: "Los Angeles",  tz: "America/Los_Angeles",cx: 593,  cy: 981,  d: 500 },
-    { city: "Regina",       tz: "America/Regina",     cx: 556,  cy: 409,  d: 140 },
-    { city: "Denver",       tz: "America/Denver",     cx: 1135, cy: 482,  d: 168 },
-    { city: "Dallas",       tz: "America/Chicago",    cx: 1283, cy: 1140, d: 220, corr: 0.6 },
-    { city: "Moncton",      tz: "America/Moncton",    cx: 1398, cy: 1673, d: 220 },
-    { city: "Philadelphia", tz: "America/New_York",   cx: 1920, cy: 628,  d: 650, second: "sweep" },
-    { city: "UTC",          tz: "UTC",                cx: 1920, cy: 1476, d: 444 },
-    { city: "London",       tz: "Europe/London",      cx: 2689, cy: 522,  d: 430 },
-    { city: "Oslo",         tz: "Europe/Oslo",        cx: 3052, cy: 844,  d: 224 },
-    { city: "Helsinki",     tz: "Europe/Helsinki",    cx: 3256, cy: 443,  d: 194, corr: 0.9 },
-    { city: "Perth",        tz: "Australia/Perth",    cx: 2507, cy: 1127, d: 290 },
-    { city: "Adelaide",     tz: "Australia/Adelaide", cx: 2499, cy: 1600, d: 230 },
-    { city: "Sydney",       tz: "Australia/Sydney",   cx: 2935, cy: 1425, d: 344 },
-    { city: "Brisbane",     tz: "Australia/Brisbane", cx: 3391, cy: 1174, d: 288 },
-    { city: "Auckland",     tz: "Pacific/Auckland",   cx: 3385, cy: 1677, d: 250 },
+    { city: "Honolulu",     tz: "Pacific/Honolulu",   cx: 413,  cy: 1664, d: 275 },
+    { city: "Vancouver",    tz: "America/Vancouver",  cx: 905,  cy: 1645, d: 320, corr: -0.7 },
+    { city: "Los Angeles",  tz: "America/Los_Angeles",cx: 598,  cy: 983,  d: 500, corr: 0.5 },
+    { city: "Regina",       tz: "America/Regina",     cx: 565,  cy: 412,  d: 140 },
+    { city: "Denver",       tz: "America/Denver",     cx: 1140, cy: 486,  d: 165 },
+    { city: "Dallas",       tz: "America/Chicago",    cx: 1281, cy: 1141, d: 218, corr: 0.6 },
+    { city: "Moncton",      tz: "America/Moncton",    cx: 1395, cy: 1676, d: 220 },
+    { city: "Philadelphia", tz: "America/New_York",   cx: 1920, cy: 633,  d: 646, second: "sweep" },
+    { city: "UTC",          tz: "UTC",                cx: 1920, cy: 1478, d: 445 },
+    { city: "London",       tz: "Europe/London",      cx: 2684, cy: 526,  d: 430 },
+    { city: "Oslo",         tz: "Europe/Oslo",        cx: 3048, cy: 845,  d: 224 },
+    { city: "Helsinki",     tz: "Europe/Helsinki",    cx: 3245, cy: 449,  d: 190, corr: 0.9 },
+    { city: "Perth",        tz: "Australia/Perth",    cx: 2509, cy: 1126, d: 290 },
+    { city: "Adelaide",     tz: "Australia/Adelaide", cx: 2503, cy: 1604, d: 228 },
+    { city: "Sydney",       tz: "Australia/Sydney",   cx: 2938, cy: 1426, d: 344 },
+    { city: "Brisbane",     tz: "Australia/Brisbane", cx: 3392, cy: 1174, d: 288, corr: -0.3 },
+    { city: "Auckland",     tz: "Pacific/Auckland",   cx: 3395, cy: 1682, d: 250, corr: -0.5 },
   ];
 
   const SVGNS = "http://www.w3.org/2000/svg";
@@ -247,7 +254,7 @@
   if (GRID) {
     const W = 3840, H = 2160, gg = make("g");
     // Dim the wall behind the grid so the green lines stand out.
-    gg.appendChild(make("rect", { x: 0, y: 0, width: W, height: H, fill: "#000", opacity: 0.1 }));
+    gg.appendChild(make("rect", { x: 0, y: 0, width: W, height: H, fill: "#000", opacity: 0.2 }));
     for (let x = 0; x <= W; x += GRID_STEP) {
       gg.appendChild(make("line", { class: "grid-line", x1: x, y1: 0, x2: x, y2: H }));
       const t = make("text", { class: "grid-label", x: x + 4, y: 18 });
