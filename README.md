@@ -85,12 +85,16 @@ Everything lives in the `<script>` in `index.html`:
   colors. Override per clock with a `style: { ... }` object; overrides merge
   per-property, so `style: { minute: { color: "#a00" } }` keeps the default
   minute length and thickness.
-- `factor` — hand-**width** multiplier. Hand thickness is a fraction of each
-  dial's radius, so large dials get fat hands and small ones get spindly hands.
-  Set `DEFAULTS.factor` (the global baseline) and/or a per-clock `factor` to even
-  them out (`< 1` slims, `> 1` thickens). The factor only scales thicknesses that
-  come from `DEFAULTS`; if a clock overrides a hand's `thick` explicitly, that
-  value is used verbatim and the factor is discarded for that hand.
+- `factor` — hand-**width** multiplier, also applied to the **hub dots**. Hand
+  thickness and hub radius are fractions of each dial's radius, so large dials get
+  fat hands and small ones get spindly hands. Set `DEFAULTS.factor` (the global
+  baseline) and/or a per-clock `factor` to even them out (`< 1` slims, `> 1`
+  thickens). The factor only scales values that come from `DEFAULTS`; if a clock
+  overrides a hand's `thick` (or a `hubGray`/`hubRed`) explicitly, that value is
+  used verbatim and the factor is discarded for it.
+- Hands cast a light, diffuse drop shadow onto the dials via a single
+  `filter: drop-shadow(...)` on the `#hands` SVG (in the CSS). Adjust the offset,
+  blur, and opacity there to taste.
 - Per-clock photo hands: add `images: { hour|minute|second: { href, pivot } }`,
   where `pivot` is the fraction of the image height from the rotation center to
   the far tip (0.5 = pivot at the image's middle).

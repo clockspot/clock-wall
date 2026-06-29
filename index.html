@@ -44,7 +44,13 @@
 
   #bg, #fg { object-fit: fill; }  /* stage is already correct aspect */
   #fg { pointer-events: none; }
-  #hands { pointer-events: none; }
+  #hands {
+    pointer-events: none;
+    /* Very light, very diffuse shadow the hands cast onto the dials. Applied to
+       the whole layer, so it follows the alpha of every hand (and hub) for free.
+       Tune: drop-shadow(<offX> <offY> <blur> <color>). */
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.2));
+  }
 
   /* Debug overlay (enable with ?debug): dial outlines, centers, labels. */
   .dbg-circle { fill: none; stroke: #0f0; stroke-width: 2; opacity: .8; }
@@ -121,10 +127,10 @@
     second: { len: 1.00, thick: 0.02, color: "#954" },
     hubGray: 0.08,   // gray center dot radius
     hubRed:  0.03,   // red center dot radius (only when a second hand exists)
-    // Hand-WIDTH factor: multiplies every hand thickness. Because thickness is
-    // a fraction of each dial's radius, big dials get fat hands and small dials
-    // get spindly ones; set a per-clock `factor` (see CLOCKS) to even them out.
-    // The factor is ignored for any hand whose `thick` is overridden explicitly.
+    // Hand-WIDTH factor: multiplies every hand thickness AND hub-dot radius.
+    // Because those are fractions of each dial's radius, big dials get fat hands
+    // and small dials get spindly ones; set a per-clock `factor` (see CLOCKS) to
+    // even them out. The factor is ignored for any value overridden explicitly.
     factor: 1,
   };
   // Global factor can be nudged live for tuning, e.g. ?factor=0.8
@@ -235,8 +241,10 @@
       thick: ov.thick != null ? ov.thick : base.thick * factor,
     };
   }
-  const pick = (c, key) =>
-    (c.style && c.style[key] != null) ? c.style[key] : DEFAULTS[key];
+  // Scalar property (hub radius): default × factor, unless overridden explicitly
+  // (in which case the factor is discarded, mirroring hand thickness).
+  const pick = (c, key, factor) =>
+    (c.style && c.style[key] != null) ? c.style[key] : DEFAULTS[key] * factor;
 
   // Build the SVG scene.
   const live = [];
@@ -252,7 +260,7 @@
     const secondSpec = handSpec(c, "second", factor);
 
     const g = make("g", { transform: `translate(${cx},${cy}) rotate(${corr})` });
-    g.appendChild(make("circle", { r: pick(c, "hubGray") * r, fill: hourSpec.color }));
+    g.appendChild(make("circle", { r: pick(c, "hubGray", factor) * r, fill: hourSpec.color }));
     const hour   = buildHand(hourSpec,   r, c.images, "hour");
     const minute = buildHand(minuteSpec, r, c.images, "minute");
     g.appendChild(hour);
@@ -264,7 +272,7 @@
       g.appendChild(second);
     }
     if (hasSecond)
-      g.appendChild(make("circle", { r: pick(c, "hubRed") * r, fill: secondSpec.color }));
+      g.appendChild(make("circle", { r: pick(c, "hubRed", factor) * r, fill: secondSpec.color }));
 
     svg.appendChild(g);
     live.push({ c, hour, minute, second, tick: c.second === "tick" });
