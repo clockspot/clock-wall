@@ -73,6 +73,7 @@
   //   ?debug      -> draw dial outlines / centers / labels to validate placement
   //   ?grid       -> draw an alignment grid (green, like ?debug) over the hands
   //   ?grid=<px>  -> same, with a custom grid spacing in image pixels
+  //   ?factor=<n> -> global hand-width multiplier (per-clock factor still wins)
   const params  = new URLSearchParams(location.search);
   const DEBUG   = params.has("debug");
   const GRID    = params.has("grid");
@@ -120,7 +121,14 @@
     second: { len: 1.00, thick: 0.02, color: "#954" },
     hubGray: 0.08,   // gray center dot radius
     hubRed:  0.03,   // red center dot radius (only when a second hand exists)
+    // Hand-WIDTH factor: multiplies every hand thickness. Because thickness is
+    // a fraction of each dial's radius, big dials get fat hands and small dials
+    // get spindly ones; set a per-clock `factor` (see CLOCKS) to even them out.
+    // The factor is ignored for any hand whose `thick` is overridden explicitly.
+    factor: 1,
   };
+  // Global factor can be nudged live for tuning, e.g. ?factor=0.8
+  const GLOBAL_FACTOR = num("factor", DEFAULTS.factor);
 
   // ---- The wall ------------------------------------------------------------
   // cx,cy = dial CENTER (image pixels); d = diameter.
@@ -128,6 +136,8 @@
   // tz    = IANA zone. style = optional per-clock overrides (see DEFAULTS).
   // second = "sweep" (smooth) or "tick" (steps each second) to give a clock a
   //          red second hand; omit for no second hand (the default).
+  // factor = per-clock hand-width multiplier (overrides the global DEFAULTS one).
+  //          Use < 1 to slim a big dial's hands, > 1 to thicken a small dial's.
   // To use a photo hand instead of a drawn one, add e.g.
   //   images: { minute: { href: "hands/min.png", pivot: 0.5 } }
   // (pivot = fraction of the image height between the rotation center and the
@@ -212,29 +222,49 @@
     return Math.round((asUTC - date.getTime()) / 1000) * 1000;
   }
 
+  // Resolve a hand's drawn style. Overrides are merged per-property (so you can
+  // set just a color, or just a length). Thickness is the global default times
+  // the clock's width `factor` — EXCEPT when an explicit `thick` override is
+  // given, in which case that exact value is used and the factor is discarded.
+  function handSpec(c, name, factor) {
+    const base = DEFAULTS[name];
+    const ov = (c.style && c.style[name]) || {};
+    return {
+      len:   ov.len   != null ? ov.len   : base.len,
+      color: ov.color != null ? ov.color : base.color,
+      thick: ov.thick != null ? ov.thick : base.thick * factor,
+    };
+  }
+  const pick = (c, key) =>
+    (c.style && c.style[key] != null) ? c.style[key] : DEFAULTS[key];
+
   // Build the SVG scene.
   const live = [];
   for (const c of CLOCKS) {
     const r = c.d / 2;
     const cx = c.cx, cy = c.cy;
-    const st = Object.assign({}, DEFAULTS, c.style);
     const corr = c.corr || 0;
     const hasSecond = !!c.second;
+    const factor = c.factor != null ? c.factor : GLOBAL_FACTOR;
+
+    const hourSpec   = handSpec(c, "hour",   factor);
+    const minuteSpec = handSpec(c, "minute", factor);
+    const secondSpec = handSpec(c, "second", factor);
 
     const g = make("g", { transform: `translate(${cx},${cy}) rotate(${corr})` });
-    g.appendChild(make("circle", { r: st.hubGray * r, fill: st.hour.color }));
-    const hour   = buildHand(st.hour,   r, c.images, "hour");
-    const minute = buildHand(st.minute, r, c.images, "minute");
+    g.appendChild(make("circle", { r: pick(c, "hubGray") * r, fill: hourSpec.color }));
+    const hour   = buildHand(hourSpec,   r, c.images, "hour");
+    const minute = buildHand(minuteSpec, r, c.images, "minute");
     g.appendChild(hour);
     g.appendChild(minute);
 
     let second = null;
     if (hasSecond) {
-      second = buildHand(st.second, r, c.images, "second");
+      second = buildHand(secondSpec, r, c.images, "second");
       g.appendChild(second);
     }
     if (hasSecond)
-      g.appendChild(make("circle", { r: st.hubRed * r, fill: st.second.color }));
+      g.appendChild(make("circle", { r: pick(c, "hubRed") * r, fill: secondSpec.color }));
 
     svg.appendChild(g);
     live.push({ c, hour, minute, second, tick: c.second === "tick" });

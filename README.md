@@ -35,6 +35,8 @@ You can also just open `index.html` in any browser to preview.
   emphasized center axes. `?grid=120` sets the spacing (image px; default 240).
   The grid lives in the hands layer, so it warps with the hands — line it up
   against the wall's perspective while tuning the warp params.
+- `?factor=` — global hand-width multiplier for live tuning (any per-clock
+  `factor` still takes precedence). Example: `index.html?factor=0.8`.
 - Warp / keyframe params for live experimentation (see "Overall warp" below):
   `?sx=`, `?sy=` (x/y scale), `?tilt=` (rotateX degrees), `?persp=` (perspective px).
   Example: `index.html?sx=1.04&sy=0.96&tilt=5`.
@@ -80,7 +82,15 @@ Everything lives in the `<script>` in `index.html`:
   `second: "sweep"` (smooth) or `second: "tick"` (steps each second). Only
   Philadelphia has one out of the box.
 - `DEFAULTS` — hand lengths/thicknesses (as fractions of each dial's radius) and
-  colors. Override per clock with a `style: { ... }` object.
+  colors. Override per clock with a `style: { ... }` object; overrides merge
+  per-property, so `style: { minute: { color: "#a00" } }` keeps the default
+  minute length and thickness.
+- `factor` — hand-**width** multiplier. Hand thickness is a fraction of each
+  dial's radius, so large dials get fat hands and small ones get spindly hands.
+  Set `DEFAULTS.factor` (the global baseline) and/or a per-clock `factor` to even
+  them out (`< 1` slims, `> 1` thickens). The factor only scales thicknesses that
+  come from `DEFAULTS`; if a clock overrides a hand's `thick` explicitly, that
+  value is used verbatim and the factor is discarded for that hand.
 - Per-clock photo hands: add `images: { hour|minute|second: { href, pivot } }`,
   where `pivot` is the fraction of the image height from the rotation center to
   the far tip (0.5 = pivot at the image's middle).
