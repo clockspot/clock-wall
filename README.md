@@ -65,6 +65,12 @@ and a rotation is only written to the DOM when it actually changes. With 17
 clocks this is negligible CPU, leaving headroom for OBS compositing + screen
 share. (No "even/odd second multiplexing" was needed — the cost isn't there.)
 
+The hand drop shadow is a CSS `filter` on the `#hands` layer, which holds only
+the hour/minute hands and hubs (they change at most once per second). The
+continuously-sweeping second hands live in a separate, unfiltered `#hands-sec`
+layer, so their per-frame motion never forces the shadow to re-rasterize — the
+filter only re-renders on the occasional minute/hour tick.
+
 Time zones use **IANA names** and are resolved with the browser's built-in
 `Intl.DateTimeFormat` (no external library); UTC offsets are cached and refreshed
 every 5 minutes so DST transitions are handled automatically.
@@ -95,6 +101,12 @@ Everything lives in the `<script>` in `index.html`:
 - Hands cast a light, diffuse drop shadow onto the dials via a single
   `filter: drop-shadow(...)` on the `#hands` SVG (in the CSS). Adjust the offset,
   blur, and opacity there to taste.
+- The second hand carries a **counterbalance** tail past the center, set by
+  `DEFAULTS.second.cb` (a fraction of the hand's length; e.g. `0.4` = 40%). Any
+  hand can be given a `cb` the same way.
+- Clocks **without** a second hand get a uniform gray (`#333`) center pin whose
+  radius is the same on every clock, set by the `PLAIN_HUB_R` constant (image px,
+  not scaled by dial size or `factor`).
 - Per-clock photo hands: add `images: { hour|minute|second: { href, pivot } }`,
   where `pivot` is the fraction of the image height from the rotation center to
   the far tip (0.5 = pivot at the image's middle).

@@ -43,11 +43,12 @@
   }
 
   #bg, #fg { object-fit: fill; }  /* stage is already correct aspect */
-  #fg { pointer-events: none; }
+  #fg, #hands, #hands-sec { pointer-events: none; }
   #hands {
-    pointer-events: none;
     /* Very light, very diffuse shadow the hands cast onto the dials. Applied to
-       the whole layer, so it follows the alpha of every hand (and hub) for free.
+       this layer only — the hour/minute hands and hubs, which change at most
+       once per second. The continuously-sweeping second hands live in #hands-sec
+       with NO filter, so their motion never forces the shadow to re-rasterize.
        Tune: drop-shadow(<offX> <offY> <blur> <color>). */
     filter: drop-shadow(0 1px 4px rgba(27, 30, 25, 0.4));
   }
@@ -68,7 +69,10 @@
   <div id="stage">
     <img id="bg" src="bg.jpg" alt="">
     <!-- viewBox uses native image pixels, so clock coordinates are used directly. -->
-    <svg id="hands" viewBox="0 0 3840 2160" xmlns="http://www.w3.org/2000/svg"></svg>
+    <!-- #hands: hour/minute/hubs (shadowed). #hands-sec: the sweeping second
+         hands (no filter, so their motion never re-rasterizes the shadow). -->
+    <svg id="hands"     viewBox="0 0 3840 2160" xmlns="http://www.w3.org/2000/svg"></svg>
+    <svg id="hands-sec" viewBox="0 0 3840 2160" xmlns="http://www.w3.org/2000/svg"></svg>
     <img id="fg" src="fg.png" alt="">
   </div>
 
@@ -107,10 +111,13 @@
     persp:  num("persp", 2000),
   };
   // transform-origin defaults to the layer's center (= wall center), so the
-  // identity warp leaves the hands exactly aligned with the photos.
-  document.getElementById("hands").style.transform =
+  // identity warp leaves the hands exactly aligned with the photos. Both hand
+  // layers get the same transform so they stay registered with each other.
+  const warpCss =
     `perspective(${WARP.persp}px) rotateX(${WARP.tilt}deg) ` +
     `scale(${WARP.scaleX}, ${WARP.scaleY})`;
+  document.getElementById("hands").style.transform = warpCss;
+  document.getElementById("hands-sec").style.transform = warpCss;
 
   // ---- Default hand styling (fractions of each clock's radius) -------------
   // Override any of these per-clock via a clock's `style` object.
@@ -123,8 +130,10 @@
 //   };
   const DEFAULTS = {
     hour:   { len: 0.66, thick: 0.07, color: "#222" },
+    // cb = counterbalance tail length, as a fraction of the hand's own length,
+    // extending past the center opposite the tip (second hand only by default).
     minute: { len: 1.00, thick: 0.05, color: "#222" },
-    second: { len: 1.00, thick: 0.02, color: "#743" },
+    second: { len: 1.00, thick: 0.02, color: "#743", cb: 0.4 },
     hubGray: 0.07,   // gray center dot radius
     hubRed:  0.03,   // red center dot radius (only when a second hand exists)
     // Hand-WIDTH factor: multiplies every hand thickness AND hub-dot radius.
@@ -135,6 +144,10 @@
   };
   // Global factor can be nudged live for tuning, e.g. ?factor=0.8
   const GLOBAL_FACTOR = num("factor", DEFAULTS.factor);
+
+  // Center pin for clocks WITHOUT a second hand: a uniform #333 dot, the same
+  // absolute radius (image px) on every clock (not scaled by dial size/factor).
+  const PLAIN_HUB_R = 4.5;
 
   // ---- The wall ------------------------------------------------------------
   // cx,cy = dial CENTER (image pixels); d = diameter.
@@ -169,7 +182,8 @@
   ];
 
   const SVGNS = "http://www.w3.org/2000/svg";
-  const svg = document.getElementById("hands");
+  const svg = document.getElementById("hands");          // hour/minute/hubs (shadowed)
+  const svgSec = document.getElementById("hands-sec");   // second hands (no filter)
   const dbg = DEBUG ? make("g") : null;
 
   function make(tag, attrs) {
@@ -199,8 +213,10 @@
       g.appendChild(el);
     } else {
       // Drawn hand: a rounded line pointing up (12 o'clock) from the center.
+      // A counterbalance (spec.cb) extends a tail the opposite way, past center.
+      const tail = (spec.cb || 0) * spec.len * r;
       g.appendChild(make("line", {
-        x1: 0, y1: 0, x2: 0, y2: -spec.len * r,
+        x1: 0, y1: tail, x2: 0, y2: -spec.len * r,
         stroke: spec.color,
         "stroke-width": spec.thick * r,
         "stroke-linecap": "round",
@@ -239,6 +255,7 @@
       len:   ov.len   != null ? ov.len   : base.len,
       color: ov.color != null ? ov.color : base.color,
       thick: ov.thick != null ? ov.thick : base.thick * factor,
+      cb:    ov.cb    != null ? ov.cb    : base.cb,
     };
   }
   // Scalar property (hub radius): default × factor, unless overridden explicitly
@@ -255,26 +272,32 @@
     const hasSecond = !!c.second;
     const factor = c.factor != null ? c.factor : GLOBAL_FACTOR;
 
+    const baseT = `translate(${cx},${cy}) rotate(${corr})`;
     const hourSpec   = handSpec(c, "hour",   factor);
     const minuteSpec = handSpec(c, "minute", factor);
-    const secondSpec = handSpec(c, "second", factor);
 
-    const g = make("g", { transform: `translate(${cx},${cy}) rotate(${corr})` });
+    // Shadowed layer: gray cap, hour, minute. Clocks without a second hand get a
+    // uniform center pin on top (caps the pivot, same size everywhere).
+    const g = make("g", { transform: baseT });
     g.appendChild(make("circle", { r: pick(c, "hubGray", factor) * r, fill: hourSpec.color }));
     const hour   = buildHand(hourSpec,   r, c.images, "hour");
     const minute = buildHand(minuteSpec, r, c.images, "minute");
     g.appendChild(hour);
     g.appendChild(minute);
+    if (!hasSecond)
+      g.appendChild(make("circle", { r: PLAIN_HUB_R, fill: "#333" }));
+    svg.appendChild(g);
 
+    // Unfiltered layer: the sweeping second hand + its red center cap on top.
     let second = null;
     if (hasSecond) {
+      const secondSpec = handSpec(c, "second", factor);
+      const gs = make("g", { transform: baseT });
       second = buildHand(secondSpec, r, c.images, "second");
-      g.appendChild(second);
+      gs.appendChild(second);
+      gs.appendChild(make("circle", { r: pick(c, "hubRed", factor) * r, fill: secondSpec.color }));
+      svgSec.appendChild(gs);
     }
-    if (hasSecond)
-      g.appendChild(make("circle", { r: pick(c, "hubRed", factor) * r, fill: secondSpec.color }));
-
-    svg.appendChild(g);
     live.push({ c, hour, minute, second, tick: c.second === "tick" });
 
     if (DEBUG) {
@@ -286,9 +309,10 @@
       dbg.appendChild(label);
     }
   }
-  if (DEBUG) svg.appendChild(dbg);
+  if (DEBUG) svgSec.appendChild(dbg);  // unfiltered layer: crisp, no drop shadow
 
-  // Alignment grid (?grid). Drawn in the hands layer so it warps with them.
+  // Alignment grid (?grid). Drawn in the (unfiltered) hands layer so it warps
+  // with them but stays crisp.
   if (GRID) {
     const W = 3840, H = 2160, gg = make("g");
     // Dim the wall behind the grid so the green lines stand out.
@@ -308,7 +332,7 @@
     // Emphasized center axes (always at the true wall center).
     gg.appendChild(make("line", { class: "grid-axis", x1: W / 2, y1: 0, x2: W / 2, y2: H }));
     gg.appendChild(make("line", { class: "grid-axis", x1: 0, y1: H / 2, x2: W, y2: H / 2 }));
-    svg.appendChild(gg);
+    svgSec.appendChild(gg);
   }
 
   // Apply a rotation only when it actually changed (cheap DOM writes).
