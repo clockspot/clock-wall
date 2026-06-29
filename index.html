@@ -86,7 +86,7 @@
     second: { len: 1.00, thick: 0.02, color: "#743", cb: 0.4 },
     hubHrMin: 0.07,
     hubSec:  0.03,
-    factor: 1 //multiplier for hand thickness and hub-dot radius; can also be overridden by ?factor URL param for tweaking
+    factor: 0.1 //multiplier for hand thickness and hub-dot radius; can also be overridden by ?factor URL param for tweaking
   };
   
   //Hub for clocks with no second hand, non-scaled (imitates minute arbor)
@@ -96,8 +96,8 @@
   //Applies to hands/debug/grid only, to match photo perspective
   const WARP_SX = 1;
   const WARP_SY = 1;
-  const WARP_TILT = -3.5; //rotation around x axis (at center of viewport) in degrees
-  const WARP_PERSP = 2000; //"distance" to the tilted plane, in IMAGE pixels (viewBox units); converted to CSS px from the current render size, so the effect is independent of viewport size / zoom
+  const WARP_TILT = -0.25; //rotation around x axis (at center of viewport) in degrees
+  const WARP_PERSP = 400; //"distance" to the tilted plane, in IMAGE pixels (viewBox units); converted to CSS px from the current render size, so the effect is independent of viewport size / zoom
 
   ////////// End config //////////
 
