@@ -17,7 +17,7 @@
 
   /* Define hour/minute hand drop shadow here */
   /* drop-shadow(<offX> <offY> <blur> <color>) */
-  #hands { filter: drop-shadow(0 1px 4px rgba(66, 66, 55, 0.35)); }
+  #hands { filter: drop-shadow(0 1px 2px rgba(33, 31, 30, 0.25)); }
 
   /* Debug overlay (enable with ?debug) */
   .dbg-circle { fill: none; stroke: #0f0; stroke-width: 2; opacity: .8; }
@@ -43,20 +43,247 @@
        xmlns="http://www.w3.org/2000/svg">
     <symbol id="london-hour" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
       <g transform="matrix(0.0552043,-1.06777e-19,1.06777e-19,0.0552043,1073.94,1078.48)">
-        <circle cx="1941.19" cy="1858.98" r="1390.68" style="fill:rgb(26,27,25);"/>
+        <circle cx="1941.19" cy="1858.98" r="1390.68" style="fill:currentColor;"/>
       </g>
       <g transform="matrix(-0.460558,5.64021e-17,-5.04275e-17,-0.411772,1724.61,1666.69)">
-        <path d="M330.396,1127.03L1189.51,1127.03L1189.51,1231.51L330.396,1231.51C321.28,1267.51 289.062,1361.34 195.7,1393.8C80.116,1433.98 -6.68,1350.06 -70.147,1295.95C-131.825,1243.38 -193.084,1215.98 -265.732,1215.98C-337.774,1215.98 -376.642,1243.79 -376.642,1243.79L-379.723,1246.01L-438.921,1179.27L-379.723,1112.53L-376.642,1114.75C-376.642,1114.75 -337.774,1142.56 -265.732,1142.56C-193.084,1142.56 -131.825,1115.16 -70.147,1062.58C-6.68,1008.48 80.116,924.559 195.7,964.74C289.062,997.196 321.28,1091.03 330.396,1127.03Z" style="fill:rgb(26,27,25);"/>
+        <path d="M330.396,1127.03L1189.51,1127.03L1189.51,1231.51L330.396,1231.51C321.28,1267.51 289.062,1361.34 195.7,1393.8C80.116,1433.98 -6.68,1350.06 -70.147,1295.95C-131.825,1243.38 -193.084,1215.98 -265.732,1215.98C-337.774,1215.98 -376.642,1243.79 -376.642,1243.79L-379.723,1246.01L-438.921,1179.27L-379.723,1112.53L-376.642,1114.75C-376.642,1114.75 -337.774,1142.56 -265.732,1142.56C-193.084,1142.56 -131.825,1115.16 -70.147,1062.58C-6.68,1008.48 80.116,924.559 195.7,964.74C289.062,997.196 321.28,1091.03 330.396,1127.03Z" style="fill:currentColor;"/>
       </g>
     </symbol>
     <symbol id="london-minute" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
       <g transform="matrix(1,0,0,1,-1.77636e-15,-0.0756048)">
         <g transform="matrix(5.92626e-17,0.967832,-0.411772,2.52138e-17,1666.69,38.2642)">
-          <path d="M85.672,1180.13L108.785,1127.03L1189.51,1127.03L1189.51,1231.51L108.785,1231.51L85.672,1180.13Z" style="fill:rgb(26,27,25);"/>
+          <path d="M85.672,1180.13L108.785,1127.03L1189.51,1127.03L1189.51,1231.51L108.785,1231.51L85.672,1180.13Z" style="fill:currentColor;"/>
         </g>
         <g transform="matrix(0.0424649,4.45037e-18,-4.45037e-18,0.0424649,1098.67,1102.16)">
-          <circle cx="1941.19" cy="1858.98" r="1390.68" style="fill:rgb(26,27,25);"/>
+          <circle cx="1941.19" cy="1858.98" r="1390.68" style="fill:currentColor;"/>
         </g>
+      </g>
+    </symbol>
+    <symbol id="helsinki-hour" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+      <g transform="matrix(2.60022e-18,-0.0424649,0.0424649,2.60022e-18,1102.16,1263.53)">
+        <circle cx="1941.19" cy="1858.98" r="1390.68" style="fill:currentColor;"/>
+      </g>
+      <g transform="matrix(6.12323e-17,-1,1,6.12323e-17,21,2362.2)">
+        <path d="M1181.1,1158.65L1163.1,1073.71L1181.1,827.359L1199.1,1073.71L1181.1,1158.65Z" style="fill:currentColor;"/>
+      </g>
+      <g transform="matrix(6.12323e-17,-1,1,6.12323e-17,21,2362.2)">
+        <path d="M1173.97,1160.16L1155.97,1075.22C1155.83,1074.55 1155.78,1073.86 1155.83,1073.18L1173.83,826.828C1174.11,823.017 1177.28,820.067 1181.1,820.067C1184.92,820.067 1188.1,823.017 1188.38,826.828L1206.38,1073.18C1206.42,1073.86 1206.38,1074.55 1206.24,1075.22L1188.24,1160.16C1187.52,1163.53 1184.55,1165.94 1181.1,1165.94C1177.66,1165.94 1174.68,1163.53 1173.97,1160.16ZM1181.1,1123.48L1191.76,1073.21L1181.1,927.42L1170.45,1073.21L1181.1,1123.48Z" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="helsinki-minute" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="matrix(2.08018e-18,0.0339719,-0.0339719,2.08018e-18,1244.26,1115.16)">
+        <circle cx="1941.19" cy="1858.98" r="1390.68" style="fill:currentColor;"/>
+      </g>
+      <g transform="matrix(1,0,0,1,0,21)">
+        <path d="M1181.1,1158.65L1166.1,1073.71L1181.1,702.359L1196.1,1073.71L1181.1,1158.65Z" style="fill:currentColor;"/>
+      </g>
+      <g transform="matrix(1,0,0,1,0,21)">
+        <path d="M1173.92,1159.92L1158.92,1074.98C1158.83,1074.46 1158.8,1073.94 1158.82,1073.42L1173.82,702.065C1173.98,698.155 1177.19,695.067 1181.1,695.067C1185.02,695.067 1188.23,698.155 1188.39,702.065L1203.39,1073.42C1203.41,1073.94 1203.37,1074.46 1203.28,1074.98L1188.28,1159.92C1187.67,1163.4 1184.64,1165.94 1181.1,1165.94C1177.56,1165.94 1174.54,1163.4 1173.92,1159.92ZM1181.1,1116.72L1188.79,1073.22L1181.1,883.024L1173.42,1073.22L1181.1,1116.72Z" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="adelaide-hour" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="matrix(2.60022e-18,-0.0424649,0.0424649,2.60022e-18,1102.16,1263.53)">
+        <circle cx="1941.19" cy="1858.98" r="1390.68" style="fill:currentColor;"/>
+      </g>
+      <g transform="matrix(6.12323e-17,-1,1,6.12323e-17,9,2364.34)">
+        <path d="M1197.82,1171.11C1197.82,1179.16 1191.29,1185.69 1183.24,1185.69C1175.19,1185.69 1168.65,1179.16 1168.65,1171.11L1168.65,769.52C1168.65,761.471 1175.19,754.936 1183.24,754.936C1191.29,754.936 1197.82,761.471 1197.82,769.52L1197.82,1171.11Z" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="adelaide-minute" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="matrix(2.08018e-18,0.0339719,-0.0339719,2.08018e-18,1244.26,1115.16)">
+        <circle cx="1941.19" cy="1858.98" r="1390.68" style="fill:currentColor;"/>
+      </g>
+      <g transform="matrix(1,0,0,1.41328,-2.13381,-474.999)">
+        <path d="M1195.74,1171.11C1195.74,1175.99 1190.13,1179.95 1183.24,1179.95C1176.34,1179.95 1170.74,1175.99 1170.74,1171.11L1170.74,769.52C1170.74,764.638 1176.34,760.675 1183.24,760.675C1190.13,760.675 1195.74,764.638 1195.74,769.52L1195.74,1171.11Z" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="auckland-hour" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="matrix(1,0,0,1,0,-0.0756048)">
+        <g transform="matrix(0.969745,0,0,0.608009,10.5639,464.096)">
+          <path d="M761.622,1180.13L792.735,1127.03L1208.51,1127.03L1208.51,1231.51L792.735,1231.51L761.622,1180.13Z" style="fill:currentColor;"/>
+        </g>
+        <g transform="matrix(0.0509578,0,0,0.0509578,1082.18,1086.37)">
+          <circle cx="1941.19" cy="1858.98" r="1390.68" style="fill:currentColor;"/>
+        </g>
+      </g>
+    </symbol>
+    <symbol id="auckland-minute" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="matrix(1,0,0,1,0,-0.0756048)">
+        <g transform="matrix(5.99341e-17,0.978798,-0.411772,2.52138e-17,1666.69,25.2195)">
+          <path d="M544.657,1180.13L567.77,1127.03L1189.51,1127.03L1189.51,1231.51L567.77,1231.51L544.657,1180.13Z" style="fill:currentColor;"/>
+        </g>
+        <g transform="matrix(0.0382184,4.00533e-18,-4.00533e-18,0.0382184,1106.91,1110.06)">
+          <circle cx="1941.19" cy="1858.98" r="1390.68" style="fill:currentColor;"/>
+        </g>
+      </g>
+    </symbol>
+    <symbol id="honolulu-hour" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+      <g transform="matrix(-0.529516,-0.0556548,0.0556543,-0.52952,2021.77,2152.82)">
+        <path d="M1899.97,1706.97C1879.64,1756.37 1833.54,1793.36 1776.74,1799.33C1694.32,1807.99 1620.38,1748.11 1611.71,1665.69C1603.05,1583.28 1662.93,1509.34 1745.35,1500.67C1802.15,1494.7 1854.94,1521.3 1885.09,1565.39L2565.55,1493.87L2644.67,1557.13L2580.43,1635.45L1899.97,1706.97Z" style="fill:currentColor;stroke:currentColor;stroke-width:0.83px;"/>
+      </g>
+    </symbol>
+    <symbol id="honolulu-minute" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="matrix(0.164531,0.506378,-0.506373,0.164532,1726.87,17.871)">
+        <path d="M1641.73,1664.06C1357.37,1571.88 588.961,1322.11 588.961,1322.11L556.195,1258.85L619.905,1226.91C619.905,1226.91 1388.15,1476.63 1672.5,1568.81C1703.32,1535.26 1752,1520.77 1798.13,1535.75C1861.19,1556.22 1895.76,1624.04 1875.29,1687.09C1854.82,1750.15 1787.01,1784.72 1723.95,1764.25C1677.94,1749.31 1647.09,1709.17 1641.73,1664.06Z" style="fill:currentColor;stroke:currentColor;stroke-width:1px;"/>
+      </g>
+    </symbol>
+    <symbol id="brisbane-hour" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="matrix(0.218642,-0.527848,0.527848,0.218642,-50.3615,1691.21)">
+        <path d="M1668.47,1641.98C1669.54,1644.43 1670.14,1647.15 1670.14,1650C1670.14,1661.11 1661.11,1670.14 1650,1670.14C1649.97,1670.14 1637.07,1671.31 1631.3,1657.47C1630.6,1655.8 1626.82,1646.69 1620.53,1631.51C1557.65,1479.89 1243.41,721.816 1243.41,721.816C1239.15,711.55 1244.04,699.76 1254.3,695.504C1264.57,691.249 1276.36,696.129 1280.61,706.395C1280.61,706.395 1594.85,1464.47 1657.73,1616.08C1664.01,1631.23 1668.47,1641.98 1668.47,1641.98Z" style="fill:currentColor;"/>
+        <g transform="matrix(0.678134,0,5.55112e-17,0.678134,531.079,531.079)">
+          <path d="M1704.44,1626.26C1707.62,1633.53 1709.39,1641.56 1709.39,1650C1709.39,1682.78 1682.78,1709.39 1650,1709.39C1649.91,1709.39 1611.95,1713.09 1595.07,1672.56C1594.37,1670.89 1590.58,1661.76 1584.27,1646.55C1521.39,1494.93 1207.15,736.846 1207.15,736.846C1194.6,706.568 1208.99,671.797 1239.27,659.246C1269.55,646.695 1304.32,661.087 1316.87,691.365C1316.87,691.365 1631.11,1449.43 1693.98,1601.05C1699.37,1614.03 1703.41,1623.77 1704.44,1626.26Z" style="fill:currentColor;"/>
+        </g>
+        <g transform="matrix(-0.180643,0.0748246,-0.0748246,-0.180643,2072.06,1825.46)">
+          <circle cx="1654.99" cy="1653.69" r="583.837" style="fill:currentColor;"/>
+        </g>
+      </g>
+    </symbol>
+    <symbol id="brisbane-minute" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="matrix(0.662547,0.274436,-0.274436,0.662547,539.828,-358.707)">
+        <path d="M1660.99,1645.09C1661.66,1646.59 1662.03,1648.25 1662.03,1650C1662.03,1656.64 1656.64,1662.03 1650,1662.03C1649.98,1662.03 1642.25,1662.68 1638.78,1654.35C1638.08,1652.68 1634.31,1643.58 1628.01,1628.4C1565.13,1476.79 1250.9,718.713 1250.9,718.713C1248.36,712.578 1251.27,705.534 1257.4,702.991C1263.54,700.448 1270.58,703.364 1273.13,709.498C1273.13,709.498 1587.36,1467.57 1650.24,1619.19C1656.52,1634.34 1660.99,1645.09 1660.99,1645.09Z" style="fill:currentColor;"/>
+        <g transform="matrix(0.678134,0,-2.77556e-17,0.678134,531.079,531.079)">
+          <path d="M1682.52,1635.8C1684.43,1640.14 1685.48,1644.95 1685.48,1650C1685.48,1669.58 1669.58,1685.48 1650,1685.48C1649.95,1685.48 1627.25,1687.65 1617.13,1663.37C1616.43,1661.7 1612.65,1652.58 1606.35,1637.39C1543.47,1485.77 1229.23,727.693 1229.23,727.693C1221.73,709.602 1230.33,688.825 1248.42,681.326C1266.52,673.826 1287.29,682.426 1294.79,700.518C1294.79,700.518 1609.03,1458.59 1671.9,1610.2C1677.59,1623.91 1681.79,1634.02 1682.52,1635.8Z" style="fill:currentColor;"/>
+        </g>
+        <g transform="matrix(0.0485788,0.11728,-0.11728,0.0485788,1760.81,1367.89)">
+          <circle cx="1654.99" cy="1653.69" r="583.837" style="fill:currentColor;"/>
+        </g>
+      </g>
+    </symbol>
+    <symbol id="la-hour" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(11.4557,-11.4557)">
+        <circle cx="0" cy="0" r="7.5" style="fill:currentColor;"/>
+        <g transform="scale(0.972973)">
+          <polygon points="-6,-40 0,-36 6,-40 3.5,75 -3.5,75" style="fill:currentColor;"/>
+          <polygon points="-21,59.3 0,80 21,59.3" style="fill:currentColor;"/>
+        </g>
+      </g>
+    </symbol>
+    <symbol id="la-minute" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(11.4557,-11.4557)">
+        <circle cx="0" cy="0" r="5.5" style="fill:currentColor;"/>
+        <g transform="scale(0.972973)">
+          <polygon points="-3,-42 0,-40.3 3,-42 1.25,103 -1.25,103" style="fill:currentColor;"/>
+          <polygon points="-7.5,97 0,106 7.5,97" style="fill:currentColor;"/>
+        </g>
+      </g>
+    </symbol>
+    <symbol id="regina-hour" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(40.7414,-40.7414)">
+        <circle cx="0" cy="0" r="5" style="fill:currentColor;"/>
+        <polygon points="-1.75,0 -1.75,21 1.75,21 1.75,0" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="regina-minute" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(40.7414,-40.7414)">
+        <circle cx="0" cy="0" r="4.5" style="fill:currentColor;"/>
+        <polygon points="-0.9,0 0.9,0 0.9,29 -0.9,29" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="oslo-hour" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(25.1383,-25.1383)">
+        <circle cx="0" cy="0" r="4.5" style="fill:currentColor;"/>
+        <polygon points="-1.175,0 0,0 1.175,0 0.875,20.5 -0.875,20.5" style="fill:currentColor;"/>
+        <circle cx="0" cy="24.5" r="4.3" style="fill:none;stroke:currentColor;stroke-width:1.4;"/>
+        <polygon points="-0.875,28.5 -0.583333,33.5 -0.416667,35 -0.291667,36.5 0,36.5 0.291667,36.5 0.416667,35 0.583333,33.5 0.875,28.5" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="oslo-minute" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(25.1383,-25.1383)">
+        <circle cx="0" cy="0" r="3.5" style="fill:currentColor;"/>
+        <polygon points="-1.1,0 -0.88,18.8 -0.733333,28.2 -0.628571,37.6 -0.52381,42.3 -0.314286,47 0,47 0.314286,47 0.52381,42.3 0.628571,37.6 0.733333,28.2 0.88,18.8 1.1,0" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="vancouver-hour" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(17.3750,-17.3750)">
+        <circle cx="0" cy="0" r="6.5" style="fill:currentColor;"/>
+        <polygon points="-3.5,0 0,0 3.5,0 3.5,45 -3.5,45" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="vancouver-minute" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(17.3750,-17.3750)">
+        <circle cx="0" cy="0" r="4.5" style="fill:currentColor;"/>
+        <polygon points="-1.25,0 0,0 1.25,0 1.25,68 -1.25,68" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="denver-hour" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(33.7571,-33.7571)">
+        <circle cx="0" cy="0" r="5.5" style="fill:currentColor;"/>
+        <polygon points="-5.365,1.2 0,1.2 5.365,1.2 0.4,27 -0.4,27" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="denver-minute" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(33.7571,-33.7571)">
+        <circle cx="0" cy="0" r="4.5" style="fill:currentColor;"/>
+        <polygon points="-2.25,-14 0,-14 2.25,-14 0.75,35 -0.75,35" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="utc-hour" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(17.3750,-17.3750)">
+        <circle cx="0" cy="0" r="4.5" style="fill:currentColor;"/>
+        <polygon points="-3,0 0,0 3,0 3,53 -3,53" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="utc-minute" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(17.3750,-17.3750)">
+        <circle cx="0" cy="0" r="4" style="fill:currentColor;"/>
+        <polygon points="-2,0 0,0 2,0 2,70 -2,70" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="philadelphia-hour" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(8.7844,-8.7844)">
+        <circle cx="0" cy="0" r="10.5" style="fill:currentColor;"/>
+        <polygon points="1,91.805 10.42,1.295 -10.42,1.295 -1,91.805" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="philadelphia-minute" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(8.7844,-8.7844)">
+        <circle cx="0" cy="0" r="8" style="fill:currentColor;"/>
+        <polygon points="1.2,134.5 4,-53.8 -4,-53.8 -1.2,134.5" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="philadelphia-second" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(8.7844,-8.7844)">
+        <circle cx="0" cy="0" r="5.5" style="fill:currentColor;"/>
+        <polygon points="0.95,134.5 2,-53.8 -2,-53.8 -0.95,134.5" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="dallas-hour" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(25.8534,-25.8534)">
+        <circle cx="0" cy="0" r="8.5" style="fill:currentColor;"/>
+        <polygon points="-8.5,0 0,0 8.5,0 1.3,32 -1.3,32" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="dallas-minute" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(25.8534,-25.8534)">
+        <circle cx="0" cy="0" r="4.5" style="fill:currentColor;"/>
+        <polygon points="-4,-20 0,-20 4,-20 1.15,45.7 -1.15,45.7" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <!-- Sydney: "burgundy clock" ATO arrow hour + ATO minute (burgundy clock.scad). -->
+    <symbol id="sydney-hour" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(15.8825,-15.8825)">
+        <circle cx="0" cy="0" r="7.5" style="fill:currentColor;"/>
+        <polygon points="-3.5,0.8 -1.5,45.1764 1.5,45.1764 3.5,0.8" style="fill:currentColor;"/>
+        <polygon points="-14.3,35.1764 0,48.1764 14.3,35.1764" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="sydney-minute" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(15.8825,-15.8825)">
+        <circle cx="0" cy="0" r="6.25" style="fill:currentColor;"/>
+        <polygon points="-2.75,-29.756 -0.7,74.39 0.7,74.39 2.75,-29.756" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <!-- Perth: Westclox tapered blades (westclox.scad). -->
+    <symbol id="perth-hour" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(19.4967,-19.4967)">
+        <circle cx="0" cy="0" r="5" style="fill:currentColor;"/>
+        <polygon points="-3,0 3,0 0.5,41.5 -0.5,41.5" style="fill:currentColor;"/>
+      </g>
+    </symbol>
+    <symbol id="perth-minute" viewBox="0 0 2363 2363" style="fill-rule:evenodd;clip-rule:evenodd">
+      <g transform="translate(1181.5,1181.5) scale(19.4967,-19.4967)">
+        <circle cx="0" cy="0" r="4" style="fill:currentColor;"/>
+        <polygon points="-2.25,0 2.25,0 0.4,60.6 -0.4,60.6" style="fill:currentColor;"/>
       </g>
     </symbol>
   </svg>
@@ -75,9 +302,11 @@
   //factor = per-clock hand-width multiplier (overrides default)
   //style  = per-clock/per-property overrides of DEFAULTS below
   //corr   = straightness correction in degrees, +clockwise / -counterclockwise
-  //second = "sweep" or "tick"
+  //second = "sweep" (smooth), "tick" (1/s), or a number = steps per second
+  //         (e.g. 4 for a coarser sweep; fewer steps = lighter CPU without a GPU)
   //svg    = to use a drawn SVG hand instead of the built-in line, add e.g.:
-  //  svg: { minute: { href: "#my-minute", scale: 1, angle: 0 } }
+  //  svg: { minute: {...}, hour: {...}, second: { href: "#my-second", scale: 1, angle: 0 } }
+  //  Keys are hour/minute/second (second only used when `second` is set).
   //  href references an in-document <symbol> (see the sprite sheet below <body>);
   //  the art is pivoted on the symbol's viewBox center (author the hand so its
   //  rotation hub sits at the center of the viewBox).
@@ -85,29 +314,78 @@
   //          scale * radius (1 reaches the dial edge). Default 1.
   //  angle = degrees to rotate the art so it points "up" at rest (12 o'clock),
   //          +clockwise. Default 0.
-  //  When svg hands are used, the hour/minute hub dot is not drawn unless the
-  //  clock's style explicitly sets hubHrMin.
+  //  color = fill for parts of the symbol drawn with fill:currentColor (the
+  //          bundled symbols use it). Omit to inherit (black). One symbol can
+  //          thus be reused across clocks at different colors.
+  //  When svg hands are used, the matching drawn hub dot is not drawn unless the
+  //  clock's style explicitly sets it (hubHrMin for hour/minute, hubSec for second).
   const CLOCKS = [
-    { city: "Honolulu",     tz: "Pacific/Honolulu",   cx: 412,  cy: 1665, d: 272, factor: 1.8 },
-    { city: "Vancouver",    tz: "America/Vancouver",  cx: 905,  cy: 1645, d: 320, factor: 0.9, style: {hour: {thick: 0.12}, hubHrMin: 0.1}, corr: -0.7 },
-    { city: "Los Angeles",  tz: "America/Los_Angeles",cx: 598,  cy: 983,  d: 500, factor: 0.65, style: {hour: {thick: 0.06}, hubHrMin: 0.06}, corr: 0.5 },
-    { city: "Regina",       tz: "America/Regina",     cx: 566,  cy: 412,  d: 130, factor: 2, style: {hour: {thick: 0.2}, hubHrMin: 0.2} },
-    { city: "Denver",       tz: "America/Denver",     cx: 1140, cy: 486,  d: 162, factor: 1.5, style: {hour: {thick: 0.15}, hubHrMin: 0.15} },
-    { city: "Dallas",       tz: "America/Chicago",    cx: 1281, cy: 1141, d: 210, factor: 1.7, corr: 0.6 },
-    { city: "Moncton",      tz: "America/Moncton",    cx: 1395, cy: 1676, d: 220, factor: 1.5 },
-    { city: "Philadelphia", tz: "America/New_York",   cx: 1920, cy: 632,  d: 636, factor: 0.85, style: {hour: {thick: 0.075}, minute: {thick: 0.035}, hubHrMin: 0.08, hubSec: 0.04}, second: "sweep" },
-    { city: "UTC",          tz: "UTC",                cx: 1920, cy: 1478, d: 445 },
-    { city: "London",       tz: "Europe/London",      cx: 2683, cy: 527,  d: 420, svg: {
-      minute: { href: "#london-minute", scale: 1.12, angle: 0 },
-      hour: { href: "#london-hour", scale: 1.12, angle: -90 }
+    { city: "Honolulu",     tz: "Pacific/Honolulu",   cx: 412,  cy: 1663, d: 272, svg: {
+      minute: { href: "#honolulu-minute", scale: 1.751, angle: 0,  color: "#1a1b19" },
+      hour:   { href: "#honolulu-hour",   scale: 1.751, angle: 90, color: "#1a1b19" }
     } },
-    { city: "Oslo",         tz: "Europe/Oslo",        cx: 3048, cy: 844,  d: 220, factor: 0.8, style: {hubHrMin: 0.08} },
-    { city: "Helsinki",     tz: "Europe/Helsinki",    cx: 3245, cy: 449,  d: 190, factor: 1.2, corr: 0.9 },
-    { city: "Perth",        tz: "Australia/Perth",    cx: 2509, cy: 1126, d: 290, style: {hubHrMin: 0.08} },
-    { city: "Adelaide",     tz: "Australia/Adelaide", cx: 2503, cy: 1605, d: 228, style: {hubHrMin: 0.09} },
-    { city: "Sydney",       tz: "Australia/Sydney",   cx: 2939, cy: 1427, d: 344, factor: 1.1 },
-    { city: "Brisbane",     tz: "Australia/Brisbane", cx: 3392, cy: 1174, d: 288, factor: 0.9, style: {hour: {thick: 0.08}, hubHrMin: 0.08}, corr: -0.3 },
-    { city: "Auckland",     tz: "Pacific/Auckland",   cx: 3395, cy: 1682, d: 245, factor: 1.5, corr: -0.5 },
+    { city: "Vancouver",    tz: "America/Vancouver",  cx: 905,  cy: 1645, d: 320, corr: -0.7, svg: {
+      minute: { href: "#vancouver-minute", scale: 1, angle: 0, color: "#1a1b19" },
+      hour:   { href: "#vancouver-hour",   scale: 1, angle: 0, color: "#1a1b19" }
+    } },
+    { city: "Los Angeles",  tz: "America/Los_Angeles",cx: 598,  cy: 983,  d: 500, corr: 0.5, svg: {
+      minute: { href: "#la-minute", scale: 1, angle: 0, color: "#1a1b19" },
+      hour:   { href: "#la-hour",   scale: 1, angle: 0, color: "#1a1b19" }
+    } },
+    { city: "Regina",       tz: "America/Regina",     cx: 564,  cy: 413,  d: 138, svg: {
+      minute: { href: "#regina-minute", scale: 1, angle: 0, color: "#1a1b19" },
+      hour:   { href: "#regina-hour",   scale: 1, angle: 0, color: "#1a1b19" }
+    } },
+    { city: "Denver",       tz: "America/Denver",     cx: 1140, cy: 486,  d: 162, svg: {
+      minute: { href: "#denver-minute", scale: 1, angle: 0, color: "#1a1b19" },
+      hour:   { href: "#denver-hour",   scale: 1, angle: 0, color: "#1a1b19" }
+    } },
+    { city: "Dallas",       tz: "America/Chicago",    cx: 1281, cy: 1141, d: 218, corr: 0.6, svg: {
+      minute: { href: "#dallas-minute", scale: 1, angle: 0, color: "#28292c" },
+      hour:   { href: "#dallas-hour",   scale: 1, angle: 0, color: "#28292c" }
+    } },
+    { city: "Moncton",      tz: "America/Moncton",    cx: 1395, cy: 1676, d: 220, factor: 1.5 },
+    { city: "Philadelphia", tz: "America/New_York",   cx: 1920, cy: 632,  d: 645, second: 25, svg: {
+      minute: { href: "#philadelphia-minute", scale: 1, angle: 0, color: "#1a1b19" },
+      hour:   { href: "#philadelphia-hour",   scale: 1, angle: 0, color: "#1a1b19" },
+      second: { href: "#philadelphia-second", scale: 1, angle: 0, color: "#884444" }
+    } },
+    { city: "UTC",          tz: "UTC",                cx: 1920, cy: 1478, d: 448, svg: {
+      minute: { href: "#utc-minute", scale: 1, angle: 0, color: "#2a2b29" },
+      hour:   { href: "#utc-hour",   scale: 1, angle: 0, color: "#2a2b29" }
+    } },
+    { city: "London",       tz: "Europe/London",      cx: 2683, cy: 527,  d: 420, svg: {
+      minute: { href: "#london-minute", scale: 1.12, angle: 0,   color: "#1a1b19" },
+      hour:   { href: "#london-hour",   scale: 1.12, angle: -90, color: "#1a1b19" }
+    } },
+    { city: "Oslo",         tz: "Europe/Oslo",        cx: 3048, cy: 844,  d: 220, svg: {
+      minute: { href: "#oslo-minute", scale: 1, angle: 0, color: "#1a1b19" },
+      hour:   { href: "#oslo-hour",   scale: 1, angle: 0, color: "#1a1b19" }
+    } },
+    { city: "Helsinki",     tz: "Europe/Helsinki",    cx: 3245, cy: 449,  d: 190, corr: 0.9, svg: {
+      minute: { href: "#helsinki-minute", scale: 2.538, angle: 0,  color: "#1a1b19" },
+      hour:   { href: "#helsinki-hour",   scale: 2.538, angle: 90, color: "#1a1b19" }
+    } },
+    { city: "Perth",        tz: "Australia/Perth",    cx: 2509, cy: 1126, d: 290, svg: {
+      minute: { href: "#perth-minute", scale: 1, angle: 0, color: "#1a1b19" },
+      hour:   { href: "#perth-hour",   scale: 1, angle: 0, color: "#1a1b19" }
+    } },
+    { city: "Adelaide",     tz: "Australia/Adelaide", cx: 2503, cy: 1605, d: 228, svg: {
+      minute: { href: "#adelaide-minute", scale: 2.032, angle: 0,  color: "#2a2b29" },
+      hour:   { href: "#adelaide-hour",   scale: 2.032, angle: 90, color: "#2a2b29" }
+    } },
+    { city: "Sydney",       tz: "Australia/Sydney",   cx: 2939, cy: 1427, d: 344, svg: {
+      minute: { href: "#sydney-minute", scale: 1, angle: 0, color: "#1a1b19" },
+      hour:   { href: "#sydney-hour",   scale: 1, angle: 0, color: "#1a1b19" }
+    } },
+    { city: "Brisbane",     tz: "Australia/Brisbane", cx: 3393, cy: 1174, d: 288, corr: -0.3, svg: {
+      minute: { href: "#brisbane-minute", scale: 1.620, angle: 0,  color: "#1a1b19" },
+      hour:   { href: "#brisbane-hour",   scale: 1.620, angle: 90, color: "#1a1b19" }
+    } },
+    { city: "Auckland",     tz: "Pacific/Auckland",   cx: 3396, cy: 1680, d: 245, corr: -0.8, svg: {
+      minute: { href: "#auckland-minute", scale: 1.896, angle: 0,  color: "#1a1b19" },
+      hour:   { href: "#auckland-hour",   scale: 1.896, angle: 90, color: "#1a1b19" }
+    } },
   ];
 
   //Default hand styles
@@ -194,6 +472,8 @@
       const scale = a.scale != null ? a.scale : 1;
       const w = 2 * scale * r;
       const holder = make("g", { transform: `rotate(${a.angle || 0})` });
+      //color drives any fill:currentColor in the symbol (the bundled ones use it)
+      if (a.color != null) holder.style.color = a.color;
       holder.appendChild(make("use", {
         href: a.href, x: -w / 2, y: -w / 2, width: w, height: w,
       }));
@@ -246,6 +526,17 @@
   const pick = (c, key, factor) =>
     (c.style && c.style[key] != null) ? c.style[key] : DEFAULTS[key] * factor;
 
+  //Second-hand step rate, in steps per second:
+  //  "sweep" = smooth (a step every animation frame, ~60/s)
+  //  "tick"  = 1/s (the usual quartz tick); a number N = N steps/s
+  //Fewer steps = fewer repaints = lighter CPU when there's no GPU to composite.
+  const SWEEP = Infinity;
+  function secondHz(v) {
+    if (v === "sweep") return SWEEP;
+    if (typeof v === "number" && v > 0) return v;
+    return 1; //"tick" (or any other truthy value enabling a second hand)
+  }
+
   //Build the SVG scene
   const dbg = DEBUG ? make("g") : null;
   const live = [];
@@ -272,7 +563,7 @@
     g.appendChild(hour);
     g.appendChild(minute);
     if (!hasSecond)
-      g.appendChild(make("circle", { r: PLAIN_HUB_R, fill: "#333" }));
+      g.appendChild(make("circle", { r: PLAIN_HUB_R, fill: "#333333" }));
     svg.appendChild(g);
 
     //Unfiltered layer: seconds and second hub
@@ -282,10 +573,14 @@
       const gs = make("g", { transform: baseT });
       second = buildHand(secondSpec, r, c.svg, "second");
       gs.appendChild(second);
-      gs.appendChild(make("circle", { r: pick(c, "hubSec", factor) * r, fill: secondSpec.color }));
+      //As with hubHrMin: an SVG second hand carries its own hub, so skip the
+      //drawn one unless the clock's style explicitly sets hubSec
+      const secHubExplicit = c.style && c.style.hubSec != null;
+      if (!(c.svg && c.svg.second) || secHubExplicit)
+        gs.appendChild(make("circle", { r: pick(c, "hubSec", factor) * r, fill: secondSpec.color }));
       svgSec.appendChild(gs);
     }
-    live.push({ c, hour, minute, second, tick: c.second === "tick" });
+    live.push({ c, hour, minute, second, secHz: secondHz(c.second) });
 
     if (DEBUG) {
       dbg.appendChild(make("circle", { class: "dbg-circle", cx, cy, r }));
@@ -338,7 +633,11 @@
       const ms = ((t % 86400000) + 86400000) % 86400000;
       const sFloor = Math.floor(ms / 1000);
 
-      const secVal = it.tick ? sFloor : ms / 1000; //per tick or smooth
+      //Quantize seconds to the hand's step rate; setRot then writes (and the
+      //browser repaints) only when the stepped angle actually changes.
+      const secVal = it.secHz === SWEEP
+        ? ms / 1000                                  //smooth
+        : Math.floor((ms / 1000) * it.secHz) / it.secHz; //N steps/s
       const minVal = sFloor / 60; //updates each second
       const hrVal  = (Math.floor(sFloor / 30) * 30) / 3600; //updates each 30s
 

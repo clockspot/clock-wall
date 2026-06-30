@@ -1,6 +1,8 @@
-# Clock Wall Virtual
+# Clock Wall
 
-A web-based reproduction of the world clock wall I use as a video-call background, so I can use it when working away from home via OBS Studio compositing.
+A web-based reproduction of the world clock wall I use as a video-call background, so I can use it when working away from home via OBS Studio compositing. [See&nbsp;it&nbsp;go!](https://clockspot.github.io/clock-wall)
+
+[![Screenshot](https://theclockspot.com/clock-wall.jpg)](https://clockspot.github.io/clock-wall)
 
 ## Layers
 
